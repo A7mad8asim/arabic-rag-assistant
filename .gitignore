@@ -16,3 +16,6 @@ eval/results/*
 !eval/results/baseline.json
 !eval/results/ablation.md
 !eval/results/ablation_*.json
+
+# Created by the Streamlit install (links into .venv)
+.agents/
