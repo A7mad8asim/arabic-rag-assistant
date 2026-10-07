@@ -1,0 +1,29 @@
+[project]
+name = "arabic-rag-assistant"
+version = "0.1.0"
+description = "Bilingual (Arabic/English) question answering over Qatar's official open statistics, with cited sources and a retrieval benchmark"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+  "requests>=2.32",
+  "numpy>=1.26",
+  "python-dotenv>=1.0",
+]
+
+[project.optional-dependencies]
+anthropic = ["anthropic>=1.0,<2"]
+dev = ["pytest>=8"]
+
+[project.scripts]
+arag = "arag.cli:main"
+
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"

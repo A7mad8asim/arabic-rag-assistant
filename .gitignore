@@ -1,0 +1,16 @@
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+*.egg-info/
+build/
+dist/
+
+.env
+data/
+.claude/
+
+# Keep the summary results; ignore individual timestamped runs
+eval/results/*
+!eval/results/latest.json
+!eval/results/baseline.json
