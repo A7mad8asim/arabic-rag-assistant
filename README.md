@@ -8,7 +8,9 @@ The corpus is the **1,432 datasets the National Planning Council publishes on th
 
 The design rule: **the model may only repeat a number that appears in a source it cites.** If an answer contains any other number, it is not shown, and the reader gets the sources instead. If the sources don't contain the answer, the model must say so.
 
-> Status: **work in progress.** The pipeline, tests, a 40-question seed gold set and a first baseline are in place; a larger benchmark and the app are next. See [Roadmap](#roadmap).
+![The app answering an English question with its source card open, and a Gulf-dialect Arabic question below it](docs/screenshot.png)
+
+> Status: **work in progress.** The pipeline, the app, tests, a 40-question seed gold set and a first baseline are in place; a larger benchmark is next. See [Roadmap](#roadmap).
 
 ---
 
@@ -53,6 +55,13 @@ arag ask "كم عدد المواليد الأحياء المسجلين في 2020
 arag search "electricity consumption residential"   # retrieval only, no model
 ```
 
+Run the app (answers with expandable, linked source cards; also shows when an answer was withheld):
+
+```powershell
+pip install -e ".[app]"
+streamlit run app.py
+```
+
 Settings are listed in [`.env.example`](.env.example). `arag fetch --limit 50` downloads a small sample for a quick try.
 
 ## Evaluation
@@ -92,7 +101,7 @@ What the errors show:
 
 - [ ] Grow the gold set to 100 questions (50 pairs) plus 20 unanswerable ones, with more Gulf dialect
 - [ ] Ablation: BM25 → + bge-m3 hybrid → + query translation → + reranker, per language
-- [ ] Streamlit app with cited sources and a screenshot
+- [x] Streamlit app with cited sources and a screenshot
 - [ ] Handle the 16 datasets with more than 5,000 rows (currently indexed by their description card only)
 - [ ] Compare Qwen3-8B with the Claude API on the same set; Docker
 
