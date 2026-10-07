@@ -1,8 +1,9 @@
-"""Question → retrieved sources → cited answer → grounding check.
+"""Question → retrieved sources → (focused rows) → cited answer → grounding check.
 
 The rule, as in Ask-the-Data: the model may only repeat numbers that appear in the sources it
 cites. An answer with a number that is not in its cited sources is not shown; the reader gets
-the sources instead.
+the sources instead. With row focus, each table chunk is cut to the rows that best match the
+question before the model sees it, and the check uses exactly the text the model saw.
 """
 
 from __future__ import annotations
@@ -10,10 +11,11 @@ from __future__ import annotations
 import re
 import time
 from dataclasses import dataclass, field
+from typing import Callable
 
 from .index import Hit, Index
 from .llm import LLM
-from .rerank import Reranker, retrieve
+from .rerank import Reranker, focus_rows, match_text, retrieve
 from .text import is_arabic, numbers_in
 
 NOT_FOUND = "NOT_FOUND"
@@ -33,6 +35,31 @@ _CITE = re.compile(r"\[\s*(?:n|source\s*|مصدر\s*)?([0-9٠-٩]+(?:\s*[,،]\s*
 _AR_DIGITS = str.maketrans("٠١٢٣٤٥٦٧٨٩", "0123456789")
 
 
+# The model sometimes declines in words instead of the NOT_FOUND token ("The provided data does not include ...").
+_DECLINE = re.compile(
+    r"\b(?:(?:does|do|did) not (?:include|contain|provide|have|specify|mention|cover|list|show|give|report)"
+    r"|(?:is|are) not (?:available|included|provided|mentioned|listed|given)|no (?:data|information|figures?|records?) "
+    r"(?:is|are|was|were|on|for|about)|not (?:found|available) in|cannot (?:be )?(?:found|determined|answered)|unable to)\b"
+    r"|لا (?:يوجد|توجد|يتوفر|تتوفر|تحتوي|يحتوي|تتضمن|يتضمن|تشمل|يشمل|تذكر|يذكر)|لم (?:يتم|يرد|ترد|أجد|نجد|تذكر|يذكر)"
+    r"|غير (?:متوفر|متوفرة|متاح|متاحة|موجود|موجودة|مذكور|مذكورة)|ليست? (?:متوفر|متاح|موجود)",
+    re.IGNORECASE,
+)
+
+
+def declined(answer: str, question: str = "") -> bool:
+    """True when the reply is not an answer: the NOT_FOUND token, a decline phrase, or no figure beyond the
+    numbers already in the question.
+
+    Every question here asks for a figure. A reply that only repeats the question's numbers ("Qatar won the
+    2022 final.") is treated as "not found", never shown. (A new figure without a citation is not a decline:
+    the grounding check withholds it and shows the sources instead.)
+    """
+    body = _CITE.sub(" ", answer or "")
+    if not body.strip() or NOT_FOUND in body or _DECLINE.search(body):
+        return True
+    return not (numbers_in(body) - numbers_in(question))
+
+
 def citations(answer: str) -> list[int]:
     return [int(n) for group in _CITE.findall(answer) for n in re.split(r"\s*[,،]\s*", group.translate(_AR_DIGITS))]
 
@@ -47,24 +74,31 @@ class Answer:
     ungrounded_numbers: list[str] = field(default_factory=list)
     raw: str = ""
     seconds: float = 0.0
+    context: list[str] = field(default_factory=list)  # each source's text exactly as the model saw it
+    extra_queries: list[str] = field(default_factory=list)  # e.g. the question's translation, also searched
 
     @property
     def sources(self) -> list[Hit]:
         return [self.hits[i - 1] for i in self.cited if 0 < i <= len(self.hits)]
 
 
-def build_prompt(question: str, hits: list[Hit]) -> str:
-    blocks = [f"[{i}] {h.chunk.text}" for i, h in enumerate(hits, 1)]
+def build_context(question: str, hits: list[Hit], focus: int = 0) -> list[str]:
+    """Each source's text as the model will see it: whole, or cut to its `focus` best-matching rows."""
+    return [focus_rows(question, h.chunk.text, h.chunk.kind, focus) for h in hits]
+
+
+def build_prompt(question: str, context: list[str]) -> str:
+    blocks = [f"[{i}] {text}" for i, text in enumerate(context, 1)]
     return "Sources:\n\n" + "\n\n".join(blocks) + f"\n\nQuestion: {question}"
 
 
-def check_grounding(answer: str, question: str, hits: list[Hit]) -> tuple[list[int], list[str]]:
+def check_grounding(answer: str, question: str, context: list[str]) -> tuple[list[int], list[str]]:
     """The cited source numbers, and any number in the answer found neither in those sources nor in the question."""
-    cited = sorted({n for n in citations(answer) if 0 < n <= len(hits)})
+    cited = sorted({n for n in citations(answer) if 0 < n <= len(context)})
     body = _CITE.sub(" ", answer)
     allowed = numbers_in(question)
     for i in cited:
-        allowed |= numbers_in(hits[i - 1].chunk.text)
+        allowed |= numbers_in(context[i - 1])
     missing = sorted(n for n in numbers_in(body) if n not in allowed)
     if numbers_in(body) and not cited:
         missing = sorted(numbers_in(body) - numbers_in(question))
@@ -81,19 +115,24 @@ def _message(kind: str, arabic: bool) -> str:
     return messages[kind][1 if arabic else 0]
 
 
-def ask(question: str, index: Index, llm: LLM, k: int = 6, reranker: Reranker | None = None) -> Answer:
+def ask(question: str, index: Index, llm: LLM, k: int = 6, reranker: Reranker | None = None, focus: int = 0,
+        expand: Callable[[str], list[str]] | None = None) -> Answer:
+    """`focus` > 0 shows the model only that many best-matching rows of each table chunk (0 = whole chunks).
+    `expand` (a QueryTranslator) adds the question in the other language to the search."""
     start = time.perf_counter()
-    hits = retrieve(index, question, k, reranker)
+    extra = expand(question) if expand else []
+    hits = retrieve(index, question, k, reranker, extra=extra)
     arabic = is_arabic(question)
     if not hits:
-        return Answer(question, _message("not_found", arabic), "not_found", hits, seconds=time.perf_counter() - start)
+        return Answer(question, _message("not_found", arabic), "not_found", hits, seconds=time.perf_counter() - start,
+                      extra_queries=extra)
 
-    raw = llm.complete(SYSTEM, build_prompt(question, hits)).strip()
-    if not raw or NOT_FOUND in raw:
-        return Answer(question, _message("not_found", arabic), "not_found", hits, raw=raw, seconds=time.perf_counter() - start)
+    context = build_context(match_text(question, extra), hits, focus)
+    raw = llm.complete(SYSTEM, build_prompt(question, context)).strip()
+    if declined(raw, question):
+        return Answer(question, _message("not_found", arabic), "not_found", hits, raw=raw,
+                      seconds=time.perf_counter() - start, context=context, extra_queries=extra)
 
-    cited, missing = check_grounding(raw, question, hits)
-    if missing:
-        return Answer(question, _message("ungrounded", arabic), "ungrounded", hits, cited, missing, raw,
-                      time.perf_counter() - start)
-    return Answer(question, raw, "answered", hits, cited, [], raw, time.perf_counter() - start)
+    cited, missing = check_grounding(raw, question, context)
+    status, text = ("ungrounded", _message("ungrounded", arabic)) if missing else ("answered", raw)
+    return Answer(question, text, status, hits, cited, missing, raw, time.perf_counter() - start, context, extra)

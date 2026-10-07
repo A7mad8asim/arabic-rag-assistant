@@ -40,3 +40,10 @@ def test_save_and_load(index, tmp_path):
     loaded = Index.load(tmp_path)
     assert [c.id for c in loaded.chunks] == [c.id for c in index.chunks]
     assert top_dataset(loaded, "electricity residential") == "electricity-consumption"
+
+
+def test_mismatched_vectors_are_ignored(index, tmp_path):
+    index.save(tmp_path)
+    np.save(tmp_path / "vectors.npy", np.zeros((len(index.chunks) + 1, 4), dtype=np.float32))
+    loaded = Index.load(tmp_path, embed=lambda texts: np.zeros((len(texts), 4), dtype=np.float32))
+    assert loaded.vectors is None and loaded.embed is None

@@ -101,8 +101,10 @@ def dataset_chunks(dataset: dict, portal_url: str, rows_per_chunk: int = 20) -> 
     header = f"{title_en} | {title_ar}"
 
     records = dataset.get("records") or []
+    views = dataset.get("views") or []
     year_col = _year_column(cols)
-    years = sorted({str(r.get(year_col.name))[:4] for r in records if r.get(year_col.name)}) if year_col else []
+    year_source = records or [r for v in views for r in v["records"]]
+    years = sorted({str(r.get(year_col.name))[:4] for r in year_source if r.get(year_col.name)}) if year_col else []
 
     card_lines = [
         header,
@@ -112,19 +114,34 @@ def dataset_chunks(dataset: dict, portal_url: str, rows_per_chunk: int = 20) -> 
         "Keywords: " + ", ".join((m.get("keyword_en") or []) + (m.get("keyword_ar") or [])),
         "Columns: " + "; ".join(f"{c.label_en} / {c.label_ar}" if c.label_ar and c.label_ar != c.label_en else c.label_en for c in cols),
         f"Rows: {m.get('records_count') or len(records)}" + (f" · Years: {years[0]}–{years[-1]}" if years else ""),
+        ("Indexed as totals computed from its rows: " + "; ".join(v["view"]["title_en"] for v in views)) if views else "",
     ]
     chunks = [Chunk(f"{ds}#card", ds, "card", title_en, title_ar, "\n".join(l for l in card_lines if l.strip()), url, years)]
+    chunks += _row_chunks(ds, "rows", header, records, cols, rows_per_chunk, title_en, title_ar, url)
+    for v in views:
+        view = v["view"]
+        view_header = (f"{title_en} — {view['title_en']} (computed from the dataset's rows) | "
+                       f"{title_ar} — {view['title_ar']}")
+        chunks += _row_chunks(ds, view["key"], view_header, v["records"], columns(v["fields"]), rows_per_chunk,
+                              title_en, title_ar, url)
+    return chunks
+
+
+def _row_chunks(ds: str, key: str, header: str, records: list[dict], cols: list[Column], rows_per_chunk: int,
+                title_en: str, title_ar: str, url: str) -> list[Chunk]:
+    """Rows rendered as text under `header`, grouped by year, at most `rows_per_chunk` per chunk."""
+    year_col = _year_column(cols)
 
     def year_of(r):
         return str(r.get(year_col.name))[:4] if year_col and r.get(year_col.name) else ""
 
     ordered = sorted(records, key=year_of) if year_col else records
-    n = 0
+    chunks, n = [], 0
     for year, group in groupby(ordered, key=year_of):
         group = list(group)
         for start in range(0, len(group), rows_per_chunk):
             lines = [render_row(r, cols) for r in group[start : start + rows_per_chunk]]
             n += 1
-            chunks.append(Chunk(f"{ds}#rows{n}", ds, "rows", title_en, title_ar,
+            chunks.append(Chunk(f"{ds}#{key}{n}", ds, "rows", title_en, title_ar,
                                 header + "\n" + "\n".join(lines), url, [year] if year else []))
     return chunks

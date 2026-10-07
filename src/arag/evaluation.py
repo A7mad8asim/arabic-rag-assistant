@@ -23,8 +23,8 @@ from pathlib import Path
 
 from .index import Hit, Index
 from .llm import LLM
-from .pipeline import ask
-from .rerank import Reranker, retrieve
+from .pipeline import ask, build_context
+from .rerank import Reranker, match_text, retrieve
 from .text import numbers_in
 
 
@@ -54,6 +54,12 @@ def evidence_rank(hits: list[Hit], item: dict) -> int | None:
         if h.chunk.dataset_id in item["dataset_ids"] and need <= numbers_in(h.chunk.text):
             return i
     return None
+
+
+def evidence_shown(hits: list[Hit], context: list[str], item: dict) -> bool:
+    """Did the text the model actually saw (after row focus) still contain the answer row of an accepted dataset?"""
+    need = _gold_numbers(item)
+    return any(h.chunk.dataset_id in item["dataset_ids"] and need <= numbers_in(text) for h, text in zip(hits, context))
 
 
 def retrieval_rank(index: Index, question: str, dataset_ids: list[str], k: int, reranker: Reranker | None = None) -> int | None:
@@ -90,6 +96,7 @@ def summarize(rows: list[dict], k: int, with_answers: bool) -> dict:
             "mrr": round(sum(1 / r["rank"] for r in lookups if r["rank"]) / len(lookups), 3) if lookups else None,
             "evidence@1": _pct([r["evidence"] == 1 for r in lookups]),
             f"evidence@{k}": _pct([r["evidence"] is not None for r in lookups]),
+            "evidence_shown": _pct([r["shown"] for r in lookups]),
         }
         if with_answers:
             s["answer_accuracy"] = _pct([r["correct"] for r in rs])
@@ -101,19 +108,24 @@ def summarize(rows: list[dict], k: int, with_answers: bool) -> dict:
     return summary
 
 
-def evaluate(gold: list[dict], index: Index, llm: LLM | None = None, k: int = 6, reranker: Reranker | None = None) -> dict:
+def evaluate(gold: list[dict], index: Index, llm: LLM | None = None, k: int = 6, reranker: Reranker | None = None,
+             focus: int = 0, expand=None) -> dict:
     rows = []
     for item in gold:
         row = {"id": item["id"], "lang": item["lang"], "kind": item["kind"],
                "split": item.get("split", "dev"), "dialect": item.get("dialect", False)}
         if llm is not None:
-            ans = ask(item["question"], index, llm, k, reranker)
+            ans = ask(item["question"], index, llm, k, reranker, focus, expand)
             hits = ans.hits  # the chunks the model saw: retrieve (and an LLM rerank) only once
+            context = ans.context or build_context(item["question"], hits, focus)
             row.update(status=ans.status, answer=ans.text, correct=answer_correct(item, ans), seconds=round(ans.seconds, 2),
-                       cited=[h.chunk.dataset_id for h in ans.sources])
+                       cited=[h.chunk.dataset_id for h in ans.sources], extra_queries=ans.extra_queries)
         else:
-            hits = retrieve(index, item["question"], k, reranker)
+            extra = expand(item["question"]) if expand else []
+            hits = retrieve(index, item["question"], k, reranker, extra=extra)
+            context = build_context(match_text(item["question"], extra), hits, focus)
         if item["kind"] == "lookup":
-            row.update(rank=dataset_rank(hits, item["dataset_ids"]), evidence=evidence_rank(hits, item))
+            row.update(rank=dataset_rank(hits, item["dataset_ids"]), evidence=evidence_rank(hits, item),
+                       shown=evidence_shown(hits, context, item))
         rows.append(row)
     return {"summary": summarize(rows, k, llm is not None), "rows": rows}

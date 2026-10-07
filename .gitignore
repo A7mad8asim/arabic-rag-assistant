@@ -19,3 +19,4 @@ eval/results/*
 
 # Created by the Streamlit install (links into .venv)
 .agents/
+!eval/results/final_*.json

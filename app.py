@@ -10,6 +10,7 @@ from arag.config import DEFAULT_MODELS, Settings
 from arag.index import Hit, Index, embedder_for
 from arag.llm import LLMError, make_llm
 from arag.pipeline import Answer, ask
+from arag.query import QueryTranslator
 from arag.rerank import make_reranker
 from arag.text import is_arabic
 
@@ -38,28 +39,37 @@ def text_block(text: str) -> None:
     st.markdown(f"<div dir='{direction}' style='font-size:1.08rem;line-height:1.7'>{body}</div>", unsafe_allow_html=True)
 
 
-def source_card(n: int, hit: Hit) -> None:
+def source_card(n: int, hit: Hit, shown: str) -> None:
+    """A cited source: its titles, a link, and the rows the model saw (all rows one click away if they were cut)."""
     c = hit.chunk
     years = f" · {', '.join(c.years)}" if c.years and c.kind == "rows" else ""
     with st.expander(f"[{n}]  {c.title_en}{years}"):
         st.markdown(f"<div dir='rtl'>{html.escape(c.title_ar)}</div>", unsafe_allow_html=True)
         st.markdown(f"[Open the dataset on data.gov.qa]({c.url})")
-        st.code(c.text, language=None, wrap_lines=True, height=220)
+        if shown != c.text:
+            st.caption("The rows the model saw")
+        st.code(shown, language=None, wrap_lines=True, height=220 if shown == c.text else "content")
+        if shown != c.text:
+            with st.popover("All rows in this chunk"):
+                st.code(c.text, language=None, wrap_lines=True)
 
 
 def render(ans: Answer) -> None:
+    shown = ans.context or [h.chunk.text for h in ans.hits]
     if ans.status == "answered":
         text_block(ans.text)
         st.caption(f"{ans.seconds:.1f} s · every number above was found in its cited source")
         for n in ans.cited:
-            source_card(n, ans.hits[n - 1])
+            source_card(n, ans.hits[n - 1], shown[n - 1])
     elif ans.status == "not_found":
         st.info(ans.text, icon=":material/search_off:")
     else:  # ungrounded
         st.warning(ans.text, icon=":material/gpp_maybe:")
         st.caption("Numbers the sources did not contain: " + ", ".join(ans.ungrounded_numbers))
         for n, hit in enumerate(ans.hits[:3], 1):
-            source_card(n, hit)
+            source_card(n, hit, shown[n - 1])
+    if ans.extra_queries:
+        st.caption("Also searched: " + " · ".join(ans.extra_queries))
     with st.expander("All retrieved chunks", icon=":material/list:"):
         for n, h in enumerate(ans.hits, 1):
             st.markdown(f"**[{n}]** `{h.chunk.id}`")
@@ -82,6 +92,10 @@ with st.sidebar:
                       help="rows: rank chunks by their best single row (fast, default) · llm: the model picks the "
                            "chunks that hold the answer (one extra call) · none: BM25 order")
     top_k = st.slider("Sources per question", 3, 10, settings.top_k)
+    translate = st.toggle("Query translation", settings.translate_query,
+                          help="Also search with the question translated into the other language (one extra model call)")
+    focus = st.slider("Rows shown per source", 0, 20, settings.focus_rows,
+                      help="Show the model only the rows of each table that best match the question. 0 = all rows.")
     st.divider()
     st.caption("Try a question")
     pressed = [q for q in EXAMPLES if st.button(q, width="stretch")]  # draw every button, then pick
@@ -118,7 +132,8 @@ if question:
         try:
             with st.spinner("Searching 1,432 datasets ..."):
                 llm = make_llm(settings.with_(llm_provider=provider, llm_model=model))
-                ans = ask(question, index, llm, top_k, make_reranker(rerank, llm))
+                ans = ask(question, index, llm, top_k, make_reranker(rerank, llm), focus,
+                          QueryTranslator(llm) if translate else None)
         except LLMError as e:
             st.error(str(e), icon=":material/error:")
             st.stop()

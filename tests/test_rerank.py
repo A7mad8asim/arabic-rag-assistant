@@ -1,7 +1,7 @@
 from arag.chunking import Chunk
 from arag.evaluation import evidence_rank
 from arag.index import Hit
-from arag.rerank import LLMReranker, RowReranker, best_row, make_reranker, retrieve
+from arag.rerank import FOCUS_NOTE, LLMReranker, RowReranker, best_row, focus_rows, make_reranker, retrieve
 
 from conftest import FakeLLM
 
@@ -52,3 +52,20 @@ def test_evidence_rank():
     item = {"dataset_ids": ["gyms"], "answer": ["107"]}
     assert evidence_rank([Hit(SPREAD, 1), Hit(EXACT, 1)], item) == 2
     assert evidence_rank([Hit(SPREAD, 1)], item) is None
+
+
+MANY = chunk("M", [f"Year: 2023 · Type: Hotel Gyms · Municipality: Town{i} · Number: {i}" for i in range(10)]
+                  + ["Year: 2023 · Type: Hotel Gyms · Municipality: Doha · Number: 107"])
+
+
+def test_focus_keeps_only_the_best_rows_in_order():
+    text = focus_rows(QUESTION, MANY.text, "rows", 2)
+    lines = text.split("\n")
+    assert lines[0] == HEADER and lines[1] == FOCUS_NOTE
+    assert len(lines) == 4 and "Number: 107" in text and "Town9" not in text
+
+
+def test_focus_leaves_cards_and_short_chunks_alone():
+    assert focus_rows(QUESTION, EXACT.text, "rows", 3) == EXACT.text
+    assert focus_rows(QUESTION, MANY.text, "card", 1) == MANY.text
+    assert focus_rows(QUESTION, MANY.text, "rows", 0) == MANY.text

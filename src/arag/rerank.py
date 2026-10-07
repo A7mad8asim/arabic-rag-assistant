@@ -16,9 +16,9 @@ from __future__ import annotations
 import json
 import re
 from dataclasses import dataclass
-from typing import Protocol
+from typing import Callable, Protocol
 
-from .index import Hit, Index
+from .index import Hit, Index, rrf_scores
 from .llm import LLM
 from .text import numbers_in, tokenize
 
@@ -40,20 +40,42 @@ class RowMatch:
     row: str
 
 
-def best_row(question: str, chunk_text: str, kind: str) -> RowMatch:
+def _row_scores(question: str, header: str, rows: list[str]) -> list[float]:
+    """For each row: share of the question's words found in the row (or the dataset title) plus share of its numbers."""
     q_words = set(tokenize(question))
     q_nums = numbers_in(question)
-    header, rows = _rows(chunk_text)
     title_words = set(tokenize(header))
-    candidates = rows if kind == "rows" and rows else [chunk_text]
-    best = RowMatch(-1.0, "")
-    for row in candidates:
-        words = title_words | set(tokenize(row))
-        cover = len(q_words & words) / len(q_words) if q_words else 0.0
+    scores = []
+    for row in rows:
+        cover = len(q_words & (title_words | set(tokenize(row)))) / len(q_words) if q_words else 0.0
         nums = len(q_nums & numbers_in(row)) / len(q_nums) if q_nums else 0.0
-        if cover + nums > best.score:
-            best = RowMatch(cover + nums, row)
-    return best
+        scores.append(cover + nums)
+    return scores
+
+
+def best_row(question: str, chunk_text: str, kind: str) -> RowMatch:
+    header, rows = _rows(chunk_text)
+    candidates = rows if kind == "rows" and rows else [chunk_text]
+    scores = _row_scores(question, header, candidates)
+    i = max(range(len(candidates)), key=lambda j: (scores[j], -j))
+    return RowMatch(scores[i], candidates[i])
+
+
+FOCUS_NOTE = "(only the rows that best match the question are shown)"
+
+
+def focus_rows(question: str, chunk_text: str, kind: str, keep: int) -> str:
+    """The chunk as the model should see it: its header and only the `keep` rows that best match the question.
+
+    A 20-row chunk invites the model to quote a neighbouring row; this leaves it the few rows that can answer.
+    Rows keep their original order. Card chunks, and chunks with `keep` rows or fewer, are returned unchanged.
+    """
+    header, rows = _rows(chunk_text)
+    if keep <= 0 or kind != "rows" or len(rows) <= keep:
+        return chunk_text
+    scores = _row_scores(question, header, rows)
+    top = sorted(range(len(rows)), key=lambda i: (-scores[i], i))[:keep]
+    return "\n".join([header, FOCUS_NOTE] + [rows[i] for i in sorted(top)])
 
 
 class RowReranker:
@@ -112,11 +134,31 @@ class LLMReranker:
         return [pool[i - 1] for i in order] + hits[self.candidates :]
 
 
-def retrieve(index: Index, question: str, k: int = 6, reranker: Reranker | None = None, pool: int = 30) -> list[Hit]:
-    """BM25 (or hybrid) retrieval of a candidate pool, optionally reranked, cut to the top k."""
-    if reranker is None:
-        return index.search(question, k)
-    return reranker.rerank(question, index.search(question, pool))[:k]
+def match_text(question: str, extra: list[str] | None) -> str:
+    """The text rows are matched against: the question plus its translations (so dialect words that never
+    appear in the data are backed up by their Modern Standard Arabic or English equivalents)."""
+    return " ".join([question, *(extra or [])])
+
+
+def retrieve(index: Index, question: str, k: int = 6, reranker: Reranker | None = None, pool: int = 30,
+             expand: Callable[[str], list[str]] | None = None, extra: list[str] | None = None) -> list[Hit]:
+    """BM25 (or hybrid) retrieval of a candidate pool, optionally reranked, cut to the top k.
+
+    Extra queries (`extra`, or computed by `expand`, for example a QueryTranslator) widen the search:
+    the pool is the reciprocal rank fusion of the searches for the question and each extra query, and
+    the reranker matches rows against the question and its translations together.
+    """
+    if extra is None:
+        extra = expand(question) if expand else []
+    if not extra:
+        candidates = index.search(question, pool if reranker else k)
+    else:
+        runs = [index.search(q, pool) for q in [question, *extra]]
+        fused = rrf_scores([[h.chunk.id for h in run] for run in runs])
+        chunks = {h.chunk.id: h.chunk for run in runs for h in run}
+        order = sorted(fused, key=fused.get, reverse=True)[: pool if reranker else k]
+        candidates = [Hit(chunks[cid], fused[cid]) for cid in order]
+    return reranker.rerank(match_text(question, extra), candidates)[:k] if reranker else candidates[:k]
 
 
 def make_reranker(name: str, llm: LLM | None = None) -> Reranker | None:

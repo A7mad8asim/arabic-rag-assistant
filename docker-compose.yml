@@ -1,0 +1,57 @@
+# docker compose up --build      then open http://localhost:8501
+# First start: pulls the models into the ollama volume (about 6.5 GB), downloads the statistics and builds
+# the index into the data volume (about 20 minutes, plus about 25 for embeddings with RETRIEVAL=hybrid).
+# Later starts reuse both volumes. To refresh the data:  docker compose run --rm app arag fetch  (then arag index)
+
+services:
+  ollama:
+    image: ollama/ollama:latest
+    volumes:
+      - ollama:/root/.ollama
+    environment:
+      - OLLAMA_KEEP_ALIVE=30m
+    healthcheck:
+      test: ["CMD", "ollama", "list"]
+      interval: 5s
+      retries: 20
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+  ollama-pull:
+    image: ollama/ollama:latest
+    depends_on:
+      ollama:
+        condition: service_healthy
+    environment:
+      - OLLAMA_HOST=http://ollama:11434
+    entrypoint: ["/bin/sh", "-c", "ollama pull ${LLM_MODEL:-qwen3:8b} && ollama pull ${EMBEDDING_MODEL:-bge-m3}"]
+    restart: "no"
+
+  app:
+    build: .
+    depends_on:
+      ollama-pull:
+        condition: service_completed_successfully
+    ports:
+      - "8501:8501"
+    volumes:
+      - data:/data
+    environment:
+      - LLM_PROVIDER=${LLM_PROVIDER:-ollama}
+      - LLM_MODEL=${LLM_MODEL:-qwen3:8b}
+      - OLLAMA_BASE_URL=http://ollama:11434
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+      - RETRIEVAL=${RETRIEVAL:-hybrid}
+      - EMBEDDING_MODEL=${EMBEDDING_MODEL:-bge-m3}
+      - RERANK=${RERANK:-llm}
+      - FOCUS_ROWS=${FOCUS_ROWS:-3}
+      - TRANSLATE_QUERY=${TRANSLATE_QUERY:-1}
+
+volumes:
+  ollama:
+  data:

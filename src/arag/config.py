@@ -32,6 +32,8 @@ class Settings:
     embedding_model: str
     top_k: int
     rerank: str  # none | rows (default) | llm
+    focus_rows: int  # show the model only this many best-matching rows per table chunk; 0 = whole chunks
+    translate_query: bool  # also search with the question translated into the other language
     portal_url: str
     publisher: str
     max_rows_per_dataset: int
@@ -60,9 +62,11 @@ class Settings:
             embedding_model=_env("EMBEDDING_MODEL", "bge-m3"),
             top_k=int(_env("TOP_K", "6")),
             rerank=_env("RERANK", "rows").lower(),
+            focus_rows=int(_env("FOCUS_ROWS", "0")),
+            translate_query=_env("TRANSLATE_QUERY", "0").lower() in ("1", "true", "yes"),
             portal_url=_env("PORTAL_URL", "https://www.data.gov.qa").rstrip("/"),
             publisher=_env("PUBLISHER", "National Planning Council"),
-            max_rows_per_dataset=int(_env("MAX_ROWS_PER_DATASET", "5000")),
+            max_rows_per_dataset=int(_env("MAX_ROWS_PER_DATASET", "30000")),
             rows_per_chunk=int(_env("ROWS_PER_CHUNK", "20")),
         )
 

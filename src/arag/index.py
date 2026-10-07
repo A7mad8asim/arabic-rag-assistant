@@ -69,12 +69,18 @@ def ollama_embedder(model: str, base_url: str, batch: int = 32, timeout_s: float
     return embed
 
 
-def rrf(rankings: Sequence[Sequence[int]], k: int = 60) -> list[int]:
-    """Reciprocal rank fusion of several rankings (lists of document indices, best first)."""
-    score: dict[int, float] = {}
+def rrf_scores(rankings: Sequence[Sequence], k: int = 60) -> dict:
+    """Reciprocal rank fusion: item -> fused score, from several rankings (best first)."""
+    score: dict = {}
     for ranking in rankings:
         for rank, i in enumerate(ranking):
             score[i] = score.get(i, 0.0) + 1 / (k + rank + 1)
+    return score
+
+
+def rrf(rankings: Sequence[Sequence[int]], k: int = 60) -> list[int]:
+    """Reciprocal rank fusion of several rankings (lists of document indices, best first)."""
+    score = rrf_scores(rankings, k)
     return sorted(score, key=score.get, reverse=True)
 
 
@@ -103,9 +109,10 @@ class Index:
         if self.vectors is not None and self.embed is not None:
             try:
                 q = self.embed([query])[0]
-                dense = list(np.argsort(-(self.vectors @ q))[:pool])
-                fused = rrf([ranked, dense])
-                return [Hit(self.chunks[i], 0.0) for i in fused[:k]]
+                dense = [int(i) for i in np.argsort(-(self.vectors @ q))[:pool]]
+                fused = rrf_scores([ranked, dense])
+                best = sorted(fused, key=fused.get, reverse=True)[:k]
+                return [Hit(self.chunks[i], fused[i]) for i in best]
             except Exception as e:  # a missing embedding model must not break answering
                 log.warning("dense retrieval failed, using BM25 only: %s", e)
         return [Hit(self.chunks[i], bm[i]) for i in ranked[:k]]
@@ -133,6 +140,10 @@ class Index:
             self.bm25 = pickle.load(f)
         vec = index_dir / "vectors.npy"
         self.vectors = np.load(vec) if vec.exists() else None
+        if self.vectors is not None and len(self.vectors) != len(self.chunks):
+            log.warning("vectors.npy does not match the index (%d vs %d chunks); run `arag embed` again. Using BM25 only.",
+                        len(self.vectors), len(self.chunks))
+            self.vectors = None
         self.embed = embed if self.vectors is not None else None
         return self
 
@@ -141,7 +152,26 @@ def embedder_for(settings: Settings) -> Embedder | None:
     return ollama_embedder(settings.embedding_model, settings.ollama_base_url) if settings.retrieval == "hybrid" else None
 
 
+def add_vectors(settings: Settings, batch: int = 64) -> int:
+    """Embed every chunk of the saved index with the embedding model and save the vectors next to it.
+
+    After this, RETRIEVAL=hybrid uses them; RETRIEVAL=bm25 ignores them. Returns the number of chunks embedded.
+    """
+    index = Index.load(settings.index_dir)
+    embed = ollama_embedder(settings.embedding_model, settings.ollama_base_url, batch=batch)
+    texts = [c.text for c in index.chunks]
+    parts = []
+    for start in range(0, len(texts), batch * 20):
+        parts.append(embed(texts[start : start + batch * 20]))
+        log.info("embedded %d / %d chunks", min(start + batch * 20, len(texts)), len(texts))
+    np.save(settings.index_dir / "vectors.npy", np.vstack(parts))
+    return len(texts)
+
+
 def build_index(settings: Settings) -> Index:
     index = Index.build(load_raw(settings.raw_dir), settings.portal_url, settings.rows_per_chunk, embedder_for(settings))
+    stale = settings.index_dir / "vectors.npy"
+    if index.vectors is None and stale.exists():
+        stale.unlink()  # the chunks changed; old vectors would point at the wrong ones (run `arag embed` again)
     index.save(settings.index_dir)
     return index
