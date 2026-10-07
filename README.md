@@ -75,7 +75,16 @@ Without a `.env`, everything runs on the zero-download setup (BM25 + row reranke
 docker compose up --build      # then open http://localhost:8501
 ```
 
-The first start pulls both models into the `ollama` volume (about 6.5 GB), then downloads the statistics, builds the index and embeds it into the `data` volume (about 50 minutes on a GPU). Later starts reuse both volumes. To refresh the data: `docker compose run --rm app arag fetch`, then `arag index` and `arag embed`. The compose file reserves an NVIDIA GPU for Ollama. *The Docker setup has not been test-run yet: Docker was not installed on the development machine. The compose file, Dockerfile and entrypoint were checked for syntax and paths only.*
+The first start pulls both models into the `ollama` volume (about 6.5 GB), then downloads the statistics, builds the index and embeds it into the `data` volume. Later starts reuse both volumes and are ready in under a minute. The compose file reserves an NVIDIA GPU for Ollama.
+
+**Tested** on 8 October 2026 with Docker Desktop 29.8 (WSL 2 backend) on Windows 11 and an RTX 5060 Ti:
+
+- First start: about 9 minutes to pull the models, then about 30 minutes to download all 1,432 datasets (0 failures) and build and embed the same 29,699-chunk index as a local install.
+- Both models run 100% on the GPU inside the container. The first question took 42 seconds while they loaded; after that, 1.8–4.7 seconds per question, the same as a local install.
+- Answers matched the local install: for example 107 hotel gyms in Doha (2023), exports to China in 2022 of 75,647,195,422 ريال قطري, and "not found" for the price of karak tea.
+- Docker Desktop needs WSL 2. If it reports "no virtualization available", run `wsl --install --no-distribution` in an administrator PowerShell and restart.
+
+To refresh the data: `docker compose run --rm app sh -c "arag fetch && RETRIEVAL=bm25 arag index && arag embed"`.
 
 ## Evaluation
 
@@ -159,8 +168,8 @@ The 16 datasets above 5,000 rows used to be indexed by their description only. T
 - [x] Gold questions for the trade totals and the newly indexed large tables (the large split)
 - [x] Faster recommended setup: 12.4 → 2.2 s per question (the `localhost` delay)
 - [x] App screenshot with the new controls
-- [x] Docker files
-- [ ] Test-run Docker on a machine with Docker and an NVIDIA GPU
+- [x] Docker, test-run on an RTX 5060 Ti (WSL 2)
+- [ ] Reduce the remaining wrong-row answers (7 of 120), e.g. the three near-identical textile-productivity tables
 
 ## Data and licence
 

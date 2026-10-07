@@ -5,7 +5,9 @@ set -e
 if [ ! -f "$DATA_DIR/index/chunks.jsonl" ]; then
   echo "First start: downloading Qatar's open statistics from data.gov.qa (about 20 minutes) and building the index ..."
   arag fetch
-  arag index
+  # BM25 only here: with RETRIEVAL=hybrid, `arag index` would also embed every chunk, silently.
+  # `arag embed` below does that step with progress messages.
+  RETRIEVAL=bm25 arag index
 fi
 
 if [ "${RETRIEVAL:-bm25}" = "hybrid" ] && [ ! -f "$DATA_DIR/index/vectors.npy" ]; then
