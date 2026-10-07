@@ -57,7 +57,7 @@ class Settings:
             data_dir=data_dir,
             llm_provider=provider,
             llm_model=_env("LLM_MODEL", DEFAULT_MODELS.get(provider, "qwen3:8b")),
-            ollama_base_url=_env("OLLAMA_BASE_URL", "http://localhost:11434"),
+            ollama_base_url=_env("OLLAMA_BASE_URL", "http://127.0.0.1:11434"),  # not "localhost": see .env.example
             retrieval=_env("RETRIEVAL", "bm25").lower(),
             embedding_model=_env("EMBEDDING_MODEL", "bge-m3"),
             top_k=int(_env("TOP_K", "6")),

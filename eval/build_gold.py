@@ -1,4 +1,5 @@
-"""Add the held-out test questions to eval/gold.jsonl, verifying every answer against the downloaded data.
+"""Add the held-out test questions and the large-table questions to eval/gold.jsonl, verifying every answer
+against the downloaded data.
 
 Each lookup names its dataset, the text that identifies exactly one row (`where`) and the expected value.
 The script refuses to write a question whose row is missing, ambiguous, or does not hold the value.
@@ -172,6 +173,54 @@ ALSO_ACCEPT = {
     "T28": ["non-registered-live-births-by-nationality-and-gender0"],
 }
 
+# The "large" split: the 16 datasets above 5,000 rows. Trade tables are indexed as server-side totals,
+# so their questions name a view ("dataset#by-country"). Kept apart from the 120-question benchmark.
+LARGE = [
+    ("L01", "qatar-imports-2019-2024-copy#by-country", ["Year: 2023", "Country of Origin: Japan /"], "3,601,310,832",
+     "What was the value of Qatar's imports from Japan in 2023?",
+     "كم بلغت قيمة واردات قطر من اليابان في 2023؟", False),
+    ("L02", "qatar-export-statistics-2019-2024#by-country", ["Year: 2022", "Country of Destination: China ·"], "75,647,195,422",
+     "What was the value of Qatar's exports to China in 2022?",
+     "كم بلغت قيمة صادرات قطر إلى الصين في 2022؟", False),
+    ("L03", "qatar-export-statistics-2019-2024-copy#by-month", ["Year: 2023", "Month: March"], "30,846,246,645",
+     "What was the total value of Qatar's exports in March 2023?",
+     "كم كانت القيمة الإجمالية لصادرات قطر في مارس 2023؟", False),
+    # 2014-2018 appear in two import tables whose totals differ by a few riyals, so these use years only one covers.
+    ("L04", "qatar-imports-2012-2018-copy#by-country", ["Year: 2013", "Country of Origin: Germany /"], "6,330,541,976",
+     "What was the value of Qatar's imports from Germany in 2013?",
+     "كم قيمة اللي استوردته قطر من ألمانيا سنة 2013؟", True),
+    ("L05", "qatar-imports-2025-2026#by-month", ["Year: 2025", "Month: July"], "11,523,988,197",
+     "What was the total value of Qatar's imports in July 2025?",
+     "كم كانت القيمة الإجمالية لواردات قطر في يوليو 2025؟", False),
+    ("L06", "qatar-export-statistics-2019-2024-copy#by-country", ["Year: 2022", "United States Of America"], "6,290,786,951",
+     "What was the value of Qatar's exports to the United States in 2022?",
+     "كم صدّرت قطر لأمريكا سنة 2022 بالريال؟", True),
+    ("L07", "qatar-imports-2019-2024-copy#by-country", ["Year: 2021", "Country of Origin: Indonesia /"], "91,301,636",
+     "What was the weight of Qatar's imports from Indonesia in 2021, in kilograms?",
+     "كم كان وزن واردات قطر من إندونيسيا في 2021 بالكيلوغرام؟", False),
+    ("L08", "total-registered-deaths-by-age-group-and-cause-of-death-icd",
+     ["Year: 2022", "Gender: Males", "Age Group: 50-54", "Cause of Death: Other forms of heart disease"], "76",
+     "How many men aged 50-54 died of other forms of heart disease in 2022?",
+     "كم عدد وفيات الذكور من الفئة العمرية 50-54 بسبب أشكال أخرى من أمراض القلب في 2022؟", False),
+    ("L09", "registered-qataris-deaths-by-age-group-and-cause-of-death-icd",
+     ["Year: 2021", "Gender: Males", "Age Group: 15-19", "Cause of Death: Transport accidents"], "13",
+     "How many Qatari males aged 15-19 died in transport accidents in 2021?",
+     "كم شاب قطري بين 15 و19 سنة توفى بحوادث النقل في 2021؟", True),
+    ("L10", "main-economic-indicators-by-main-economic-activity-energy-and-industry",
+     ["Year: 2017", "Main Economic Activity: Manufacture of textiles /", "Indicator: Productivity of Employee"], "124,507",
+     # Three tables publish this (all establishments, 10+ employees, fewer than 10): the question names which.
+     "What was the productivity per employee in textile manufacturing in 2017, across all establishments?",
+     "كم كانت إنتاجية المشتغل في صناعة المنسوجات عام 2017 لجميع المنشآت؟", False),
+    ("L11", "estimates-of-value-of-intermediate-services-by-main-economic-activity-energy-and-industry-10",
+     ["Year: 2017", "Main Economic Activity: Manufacture of food products /", "Machinery and Equipment Maintenance"], "15,484",
+     "What was the value of machinery and equipment maintenance services used in food manufacturing in 2017?",
+     "كم كانت قيمة خدمات صيانة الآلات والمعدات في صناعة المنتجات الغذائية عام 2017؟", False),
+    ("L12", "registered-deaths-by-nationality-gender-and-age-annual",
+     ["Year: 2020", "of Age: 72", "Nationality: Qataris", "Gender: Males"], "8",
+     "How many deaths of 72-year-old Qatari men were registered in 2020?",
+     "كم عدد وفيات الذكور القطريين بعمر 72 سنة المسجلة في 2020؟", False),
+]
+
 UNANSWERABLE = [
     ("U06", "How many hotel nights did Qatari guests spend in 2040?", "كم عدد ليالي الإقامة للنزلاء القطريين في الفنادق عام 2040؟"),
     ("U07", "What is the population of Tokyo?", "كم عدد سكان طوكيو؟"),
@@ -181,42 +230,69 @@ UNANSWERABLE = [
 ]
 
 
+def rendered_rows(data: dict, view: str | None = None) -> list[str]:
+    """The dataset's rows as the index renders them; with `view`, the rows of that totals view; with view="*", all."""
+    parts = []
+    if view in (None, "*"):
+        parts.append((columns(data["meta"]["fields"]), data["records"]))
+    for v in data.get("views", []):
+        if view == "*" or v["view"]["key"] == view:
+            parts.append((columns(v["fields"]), v["records"]))
+    return [render_row(r, cols) for cols, records in parts for r in records]
+
+
+def year_numbers(text: str) -> set[str]:
+    return {n for n in numbers_in(text) if len(n) == 4 and n[:2] in ("19", "20")}
+
+
 def main() -> int:
     raw = Settings.from_env().raw_dir
     titles: dict[str, list[str]] = {}
+    large: dict[str, dict] = {}  # datasets above 5,000 rows, for finding identical rows in sibling tables
     for p in raw.glob("*.json"):
-        meta = json.loads(p.read_text(encoding="utf-8"))["meta"]
+        data = json.loads(p.read_text(encoding="utf-8"))
+        meta = data["meta"]
         titles.setdefault(meta["metas"]["default"].get("title_en", "").strip().casefold(), []).append(meta["dataset_id"])
+        if (meta["metas"]["default"].get("records_count") or 0) > 5000:
+            large[meta["dataset_id"]] = data
 
     out, problems = [], []
-    for tid, ds, where, answer, en, ar, dialect in LOOKUPS:
-        path = dataset_path(raw, ds)
-        if not path.exists():
-            problems.append(f"{tid}: dataset {ds} not downloaded")
-            continue
-        data = json.loads(path.read_text(encoding="utf-8"))
-        cols = columns(data["meta"]["fields"])
-        rows = [render_row(r, cols) for r in data["records"]]
-        hits = [r for r in rows if all(w in r for w in where)]
-        if len(hits) != 1:
-            problems.append(f"{tid}: {len(hits)} rows match {where}")
-            continue
-        if not numbers_in(answer) <= numbers_in(hits[0]):
-            problems.append(f"{tid}: {answer} not in row: {hits[0][:200]}")
-            continue
-        title = data["meta"]["metas"]["default"].get("title_en", "").strip().casefold()
-        accepted = [ds] + sorted(d for d in titles.get(title, []) if d != ds)
-        need = numbers_in(answer) | {n for n in numbers_in(en) if len(n) == 4 and n[:2] in ("19", "20")}
-        for alt in ALSO_ACCEPT.get(tid, []):
-            alt_data = json.loads(dataset_path(raw, alt).read_text(encoding="utf-8"))
-            alt_cols = columns(alt_data["meta"]["fields"])
-            if any(need <= numbers_in(render_row(r, alt_cols)) for r in alt_data["records"]):
-                accepted.append(alt)
-            else:
-                problems.append(f"{tid}: alternative {alt} has no row with {sorted(need)}")
-        for lang, q in (("en", en), ("ar", ar)):
-            out.append({"id": tid, "lang": lang, "kind": "lookup", "question": q, "dataset_ids": accepted,
-                        "answer": [answer], "dialect": dialect and lang == "ar", "split": "test"})
+
+    def add_lookups(specs, split, also_accept, scan_large):
+        for tid, target, where, answer, en, ar, dialect in specs:
+            ds, _, view = target.partition("#")
+            path = dataset_path(raw, ds)
+            if not path.exists():
+                problems.append(f"{tid}: dataset {ds} not downloaded")
+                continue
+            data = json.loads(path.read_text(encoding="utf-8"))
+            hits = [r for r in rendered_rows(data, view or None) if all(w in r for w in where)]
+            if len(hits) != 1:
+                problems.append(f"{tid}: {len(hits)} rows match {where}")
+                continue
+            if not numbers_in(answer) <= numbers_in(hits[0]):
+                problems.append(f"{tid}: {answer} not in row: {hits[0][:200]}")
+                continue
+            title = data["meta"]["metas"]["default"].get("title_en", "").strip().casefold()
+            accepted = [ds] + sorted(d for d in titles.get(title, []) if d != ds)
+            need = numbers_in(answer) | year_numbers(en)
+            for alt in also_accept.get(tid, []):
+                alt_data = json.loads(dataset_path(raw, alt).read_text(encoding="utf-8"))
+                if any(need <= numbers_in(r) for r in rendered_rows(alt_data, "*")):
+                    accepted.append(alt)
+                else:
+                    problems.append(f"{tid}: alternative {alt} has no row with {sorted(need)}")
+            # Sibling trade tables share totals (an export table and its "for visualisation" copy). Only for answers
+            # of 100,000 or more: a small number like 13 plus a year turns up in unrelated tables by coincidence.
+            if scan_large and float(answer.replace(",", "")) >= 100_000:
+                accepted += sorted(d for d, other in large.items() if d not in accepted
+                                   and any(need <= numbers_in(r) for r in rendered_rows(other, "*")))
+            for lang, q in (("en", en), ("ar", ar)):
+                out.append({"id": tid, "lang": lang, "kind": "lookup", "question": q, "dataset_ids": accepted,
+                            "answer": [answer], "dialect": dialect and lang == "ar", "split": split})
+
+    add_lookups(LOOKUPS, "test", ALSO_ACCEPT, scan_large=False)
+    add_lookups(LARGE, "large", {}, scan_large=True)
     for uid, en, ar in UNANSWERABLE:
         for lang, q in (("en", en), ("ar", ar)):
             out.append({"id": uid, "lang": lang, "kind": "unanswerable", "question": q, "dataset_ids": [],
@@ -231,7 +307,8 @@ def main() -> int:
     with open(gold_path, "w", encoding="utf-8") as f:
         for r in kept + out:
             f.write(json.dumps(r, ensure_ascii=False) + "\n")
-    print(f"{len(kept)} dev + {len(out)} test questions -> {gold_path}")
+    counts = {s: sum(r["split"] == s for r in out) for s in ("test", "large")}
+    print(f"{len(kept)} dev + {counts['test']} test + {counts['large']} large questions -> {gold_path}")
     return 1 if problems else 0
 
 

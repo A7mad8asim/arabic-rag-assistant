@@ -19,8 +19,8 @@ import urllib.request
 
 import websockets
 
-QUESTIONS = ["How many hotel gyms were there in Doha in 2023?", "كم جريدة يومية كانت تطلع في 2023؟"]
-W, H = 1400, 1240
+QUESTIONS = ["How many hotel gyms were there in Doha in 2023?", "كم بلغت قيمة صادرات قطر إلى الصين في 2022؟"]
+W, H = 1400, 1440
 
 
 async def drive(ws_url: str, app_url: str, out: str) -> None:
@@ -51,9 +51,10 @@ async def drive(ws_url: str, app_url: str, out: str) -> None:
         await cmd("Page.navigate", url=app_url)
         await wait_for("document.querySelectorAll('[data-testid=stSidebar] button').length > 3", 60)
         for i, q in enumerate(QUESTIONS, 1):
+            await asyncio.sleep(3)  # let the previous rerun settle, or the click is lost
             await js(f"[...document.querySelectorAll('button')].find(b => b.innerText.trim() === {json.dumps(q)}).click()")
             await wait_for(f"document.querySelectorAll('[data-testid=stChatMessage]').length >= {2 * i} && "
-                           "!document.querySelector('[data-testid=stSpinner]')", 180)
+                           "!document.querySelector('[data-testid=stSpinner]')", 300)
         await asyncio.sleep(2)
         # Open the first answer's source card so the screenshot shows what a citation leads to.
         await js("document.querySelector('[data-testid=stChatMessage] [data-testid=stExpander] summary').click()")

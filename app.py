@@ -18,7 +18,7 @@ st.set_page_config(page_title="Arabic RAG Assistant", page_icon=":material/trave
 
 EXAMPLES = [
     "How many hotel gyms were there in Doha in 2023?",
-    "كم عدد المواليد الأحياء المسجلين في 2020؟",
+    "كم بلغت قيمة صادرات قطر إلى الصين في 2022؟",
     "How many tons of cargo were received at Doha International Airport in May 2014?",
     "كم جريدة يومية كانت تطلع في 2023؟",
     "How many chemistry laboratory tests did Hamad Medical Corporation do in 2018?",

@@ -106,7 +106,7 @@ def main(argv: list[str] | None = None) -> int:
     e.add_argument("--retrieval-only", action="store_true", help="skip answering; score retrieval only")
     e.add_argument("--provider", choices=["ollama", "anthropic"])
     _add_pipeline_options(e)
-    e.add_argument("--split", choices=["dev", "test"], help="only this split of the gold set")
+    e.add_argument("--split", choices=["dev", "test", "large"], help="only this split of the gold set")
     e.add_argument("--ablation", action="store_true",
                    help="run the rerankers in --rerankers at the current settings and rebuild eval/results/ablation.md "
                         "from all saved runs")

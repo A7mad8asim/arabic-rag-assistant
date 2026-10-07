@@ -34,7 +34,7 @@ def strip_think(text: str) -> str:
 class OllamaLLM:
     THINKING_FAMILIES = ("qwen3", "deepseek-r1", "qwq", "magistral")
 
-    def __init__(self, model: str, base_url: str = "http://localhost:11434", timeout_s: float = 300, num_ctx: int = 8192):
+    def __init__(self, model: str, base_url: str = "http://127.0.0.1:11434", timeout_s: float = 300, num_ctx: int = 8192):
         self.model = model
         self.base_url = base_url.rstrip("/")
         self.timeout_s = timeout_s

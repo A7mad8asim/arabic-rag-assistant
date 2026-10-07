@@ -1,32 +1,32 @@
 {
   "summary": {
     "all": {
-      "questions": 120,
-      "hit@1": 73.0,
-      "hit@6": 91.0,
-      "mrr": 0.81,
-      "evidence@1": 62.0,
-      "evidence@6": 85.0,
-      "evidence_shown": 85.0,
-      "answer_accuracy": 78.3,
-      "lookup_accuracy": 74.0,
+      "questions": 144,
+      "hit@1": 66.9,
+      "hit@6": 87.1,
+      "mrr": 0.758,
+      "evidence@1": 58.1,
+      "evidence@6": 81.5,
+      "evidence_shown": 81.5,
+      "answer_accuracy": 75.0,
+      "lookup_accuracy": 71.0,
       "unanswerable_refused": 100.0,
-      "wrong_but_shown": 11,
-      "withheld": 10
+      "wrong_but_shown": 12,
+      "withheld": 13
     },
     "en": {
-      "questions": 60,
-      "hit@1": 78.0,
-      "hit@6": 90.0,
-      "mrr": 0.837,
-      "evidence@1": 72.0,
-      "evidence@6": 88.0,
-      "evidence_shown": 88.0,
-      "answer_accuracy": 78.3,
-      "lookup_accuracy": 74.0,
+      "questions": 72,
+      "hit@1": 75.8,
+      "hit@6": 88.7,
+      "mrr": 0.82,
+      "evidence@1": 71.0,
+      "evidence@6": 87.1,
+      "evidence_shown": 87.1,
+      "answer_accuracy": 76.4,
+      "lookup_accuracy": 72.6,
       "unanswerable_refused": 100.0,
       "wrong_but_shown": 7,
-      "withheld": 4
+      "withheld": 7
     },
     "dev": {
       "questions": 40,
@@ -57,17 +57,17 @@
       "withheld": 1
     },
     "ar": {
-      "questions": 60,
-      "hit@1": 68.0,
-      "hit@6": 92.0,
-      "mrr": 0.784,
-      "evidence@1": 52.0,
-      "evidence@6": 82.0,
-      "evidence_shown": 82.0,
-      "answer_accuracy": 78.3,
-      "lookup_accuracy": 74.0,
+      "questions": 72,
+      "hit@1": 58.1,
+      "hit@6": 85.5,
+      "mrr": 0.697,
+      "evidence@1": 45.2,
+      "evidence@6": 75.8,
+      "evidence_shown": 75.8,
+      "answer_accuracy": 73.6,
+      "lookup_accuracy": 69.4,
       "unanswerable_refused": 100.0,
-      "wrong_but_shown": 4,
+      "wrong_but_shown": 5,
       "withheld": 6
     },
     "dev_ar": {
@@ -85,15 +85,15 @@
       "withheld": 3
     },
     "gulf_dialect": {
-      "questions": 13,
-      "hit@1": 75.0,
-      "hit@6": 91.7,
-      "mrr": 0.819,
-      "evidence@1": 58.3,
-      "evidence@6": 83.3,
-      "evidence_shown": 83.3,
-      "answer_accuracy": 84.6,
-      "lookup_accuracy": 83.3,
+      "questions": 16,
+      "hit@1": 66.7,
+      "hit@6": 80.0,
+      "mrr": 0.722,
+      "evidence@1": 53.3,
+      "evidence@6": 73.3,
+      "evidence_shown": 73.3,
+      "answer_accuracy": 75.0,
+      "lookup_accuracy": 73.3,
       "unanswerable_refused": 100.0,
       "wrong_but_shown": 1,
       "withheld": 1
@@ -106,11 +106,11 @@
       "evidence@1": 68.6,
       "evidence@6": 87.1,
       "evidence_shown": 87.1,
-      "answer_accuracy": 78.8,
-      "lookup_accuracy": 75.7,
+      "answer_accuracy": 81.2,
+      "lookup_accuracy": 78.6,
       "unanswerable_refused": 100.0,
-      "wrong_but_shown": 8,
-      "withheld": 6
+      "wrong_but_shown": 7,
+      "withheld": 4
     },
     "test_en": {
       "questions": 40,
@@ -120,11 +120,11 @@
       "evidence@1": 77.1,
       "evidence@6": 91.4,
       "evidence_shown": 91.4,
-      "answer_accuracy": 80.0,
-      "lookup_accuracy": 77.1,
+      "answer_accuracy": 82.5,
+      "lookup_accuracy": 80.0,
       "unanswerable_refused": 100.0,
       "wrong_but_shown": 4,
-      "withheld": 3
+      "withheld": 2
     },
     "test_ar": {
       "questions": 40,
@@ -134,11 +134,53 @@
       "evidence@1": 60.0,
       "evidence@6": 82.9,
       "evidence_shown": 82.9,
-      "answer_accuracy": 77.5,
-      "lookup_accuracy": 74.3,
+      "answer_accuracy": 80.0,
+      "lookup_accuracy": 77.1,
       "unanswerable_refused": 100.0,
-      "wrong_but_shown": 4,
-      "withheld": 3
+      "wrong_but_shown": 3,
+      "withheld": 2
+    },
+    "large": {
+      "questions": 24,
+      "hit@1": 41.7,
+      "hit@6": 70.8,
+      "mrr": 0.542,
+      "evidence@1": 41.7,
+      "evidence@6": 66.7,
+      "evidence_shown": 66.7,
+      "answer_accuracy": 50.0,
+      "lookup_accuracy": 50.0,
+      "unanswerable_refused": null,
+      "wrong_but_shown": 2,
+      "withheld": 5
+    },
+    "large_en": {
+      "questions": 12,
+      "hit@1": 66.7,
+      "hit@6": 83.3,
+      "mrr": 0.75,
+      "evidence@1": 66.7,
+      "evidence@6": 83.3,
+      "evidence_shown": 83.3,
+      "answer_accuracy": 58.3,
+      "lookup_accuracy": 58.3,
+      "unanswerable_refused": null,
+      "wrong_but_shown": 0,
+      "withheld": 4
+    },
+    "large_ar": {
+      "questions": 12,
+      "hit@1": 16.7,
+      "hit@6": 58.3,
+      "mrr": 0.333,
+      "evidence@1": 16.7,
+      "evidence@6": 50.0,
+      "evidence_shown": 50.0,
+      "answer_accuracy": 41.7,
+      "lookup_accuracy": 41.7,
+      "unanswerable_refused": null,
+      "wrong_but_shown": 2,
+      "withheld": 1
     }
   },
   "rows": [
@@ -151,7 +193,7 @@
       "status": "answered",
       "answer": "In 2023, the production of milk and dairy products in Qatar was 197,526 tons [4].",
       "correct": true,
-      "seconds": 3.2,
+      "seconds": 1.16,
       "cited": [
         "milk-and-dairy-production"
       ],
@@ -169,7 +211,7 @@
       "status": "answered",
       "answer": "بلغ إنتاج الألبان ومنتجاتها في قطر عام 2023 197,526 طن [2].",
       "correct": true,
-      "seconds": 2.91,
+      "seconds": 0.89,
       "cited": [
         "milk-and-dairy-production"
       ],
@@ -185,9 +227,9 @@
       "split": "dev",
       "dialect": false,
       "status": "answered",
-      "answer": "15,445 visitors in February 2023 [1].",
+      "answer": "In February 2023, 15,445 people visited Panda House Park [1].",
       "correct": true,
-      "seconds": 3.92,
+      "seconds": 2.01,
       "cited": [
         "visitors-of-panda-house-park-by-months"
       ],
@@ -205,7 +247,7 @@
       "status": "answered",
       "answer": "15,445 زائر في فبراير 2023 [1].",
       "correct": true,
-      "seconds": 3.76,
+      "seconds": 1.7,
       "cited": [
         "visitors-of-panda-house-park-by-months"
       ],
@@ -223,7 +265,7 @@
       "status": "answered",
       "answer": "In 2023, there were 107 hotel gyms in Doha [1].",
       "correct": true,
-      "seconds": 3.29,
+      "seconds": 1.27,
       "cited": [
         "gyms-by-entity-and-municipality"
       ],
@@ -241,7 +283,7 @@
       "status": "answered",
       "answer": "في سنة 2023، كانت هناك 107 صالة رياضية في فنادق الدوحة [2].",
       "correct": true,
-      "seconds": 3.55,
+      "seconds": 1.51,
       "cited": [
         "gyms-by-entity-and-municipality"
       ],
@@ -259,7 +301,7 @@
       "status": "answered",
       "answer": "In June 2015, the average daily sunshine duration was 12.2 hours [1].",
       "correct": true,
-      "seconds": 3.38,
+      "seconds": 1.35,
       "cited": [
         "monthly-average-daily-sunshine-duration-hours"
       ],
@@ -277,7 +319,7 @@
       "status": "answered",
       "answer": "متوسط مدة سطوع الشمس اليومية في يونيو 2015 كان 12.2 ساعات [1].",
       "correct": true,
-      "seconds": 3.45,
+      "seconds": 1.44,
       "cited": [
         "monthly-average-daily-sunshine-duration-hours"
       ],
@@ -295,7 +337,7 @@
       "status": "not_found",
       "answer": "I could not find this in Qatar's open statistics.",
       "correct": false,
-      "seconds": 2.61,
+      "seconds": 0.55,
       "cited": [],
       "extra_queries": [],
       "rank": null,
@@ -311,7 +353,7 @@
       "status": "not_found",
       "answer": "لم أجد إجابة لهذا السؤال في البيانات الإحصائية المفتوحة لدولة قطر.",
       "correct": false,
-      "seconds": 2.48,
+      "seconds": 1.74,
       "cited": [],
       "extra_queries": [],
       "rank": 2,
@@ -327,7 +369,7 @@
       "status": "answered",
       "answer": "In 2018, Hamad Medical Corporation conducted 13,558,978 chemistry laboratory tests [1].",
       "correct": true,
-      "seconds": 3.31,
+      "seconds": 1.25,
       "cited": [
         "health-statistics-number-of-laboratory-tests-done-in-hamad-medical-corporation-by-type-of-laboratory"
       ],
@@ -345,7 +387,7 @@
       "status": "answered",
       "answer": "عدد تحاليل الكيمياء التي أجريت في مؤسسة حمد الطبية عام 2018 هو 13,558,978 [1].",
       "correct": true,
-      "seconds": 4.58,
+      "seconds": 2.53,
       "cited": [
         "health-statistics-number-of-laboratory-tests-done-in-hamad-medical-corporation-by-type-of-laboratory"
       ],
@@ -363,7 +405,7 @@
       "status": "ungrounded",
       "answer": "I could not verify every number in the answer against its sources, so here are the most relevant sources instead.",
       "correct": false,
-      "seconds": 3.44,
+      "seconds": 1.51,
       "cited": [
         "quarterly-registered-live-births-by-gender-and-nationality"
       ],
@@ -381,9 +423,9 @@
       "status": "ungrounded",
       "answer": "لم أتمكن من التحقق من جميع الأرقام في الإجابة من مصادرها، لذا إليك أقرب المصادر.",
       "correct": false,
-      "seconds": 3.08,
+      "seconds": 1.01,
       "cited": [
-        "quarterly-registered-live-births-by-gender-and-nationality"
+        "registered-live-births-by-nationality-and-gender"
       ],
       "extra_queries": [],
       "rank": 5,
@@ -399,7 +441,7 @@
       "status": "answered",
       "answer": "In 2011, 400,881 radar speeding violations were recorded [1].",
       "correct": true,
-      "seconds": 3.25,
+      "seconds": 1.21,
       "cited": [
         "traffic-violations-by-type-of-violation"
       ],
@@ -417,7 +459,7 @@
       "status": "answered",
       "answer": "عدد مخالفات تجاوز السرعة (الرادار) في 2011 هو 400,881 [1].",
       "correct": true,
-      "seconds": 3.84,
+      "seconds": 1.79,
       "cited": [
         "traffic-violations-by-type-of-violation"
       ],
@@ -435,7 +477,7 @@
       "status": "answered",
       "answer": "In May 2014, 45,166 tons of cargo were received at Doha International Airport [1].",
       "correct": true,
-      "seconds": 3.21,
+      "seconds": 1.18,
       "cited": [
         "cargo-via-doha-international-airport-by-month-and-year"
       ],
@@ -453,7 +495,7 @@
       "status": "answered",
       "answer": "45,166 طن من الشحن الوارد عبر مطار الدوحة الدولي في مايو 2014 [2].",
       "correct": true,
-      "seconds": 3.3,
+      "seconds": 1.26,
       "cited": [
         "cargo-via-doha-international-airport-by-month-and-year"
       ],
@@ -471,7 +513,7 @@
       "status": "answered",
       "answer": "The year-on-year change in the consumer price index for education in Q4 2023 was 6.7 [1].",
       "correct": true,
-      "seconds": 3.99,
+      "seconds": 1.96,
       "cited": [
         "quarterly-consumer-price-index-cpi-2023-q4-2018-100"
       ],
@@ -489,7 +531,7 @@
       "status": "ungrounded",
       "answer": "لم أتمكن من التحقق من جميع الأرقام في الإجابة من مصادرها، لذا إليك أقرب المصادر.",
       "correct": false,
-      "seconds": 3.2,
+      "seconds": 1.17,
       "cited": [
         "quarterly-consumer-price-index-cpi-2023-q4-2018-100"
       ],
@@ -507,7 +549,7 @@
       "status": "answered",
       "answer": "In 2020, the Qatar National Theatre hosted 65 government-sector events [1].",
       "correct": true,
-      "seconds": 2.66,
+      "seconds": 0.59,
       "cited": [
         "events-at-qatar-national-theatre-by-sectors"
       ],
@@ -525,7 +567,7 @@
       "status": "answered",
       "answer": "عدد فعاليات القطاع الحكومي في مسرح قطر الوطني عام 2020 هو 65 [2].",
       "correct": true,
-      "seconds": 2.74,
+      "seconds": 0.65,
       "cited": [
         "events-at-qatar-national-theatre-by-sectors"
       ],
@@ -541,9 +583,9 @@
       "split": "dev",
       "dialect": false,
       "status": "answered",
-      "answer": "In 2023, the amount of domestic waste that came in was 688,681 tons [4].",
+      "answer": "According to source [4], the amount of domestic waste that came in during 2023 was 688,681 tons [4].",
       "correct": false,
-      "seconds": 4.81,
+      "seconds": 2.84,
       "cited": [
         "incoming-waste-by-type-and-waste-management-facility"
       ],
@@ -561,7 +603,7 @@
       "status": "ungrounded",
       "answer": "لم أتمكن من التحقق من جميع الأرقام في الإجابة من مصادرها، لذا إليك أقرب المصادر.",
       "correct": false,
-      "seconds": 3.92,
+      "seconds": 1.9,
       "cited": [
         "total-incoming-waste-by-type-facility-and-year"
       ],
@@ -579,7 +621,7 @@
       "status": "answered",
       "answer": "In 2023, 145 non-Qatari women received legal services from the Wifaq family consulting centre [1].",
       "correct": false,
-      "seconds": 3.16,
+      "seconds": 1.09,
       "cited": [
         "services-rendered-by-family-consulting-centre-wifaq-through-phone-calls-by-type-of-consultancy-gender-and-nationality"
       ],
@@ -597,7 +639,7 @@
       "status": "answered",
       "answer": "عدد الإناث غير القطريات اللاتي حصلن على خدمات قانونية من مركز وفاق في 2023 هو 195 [4].",
       "correct": true,
-      "seconds": 3.48,
+      "seconds": 1.43,
       "cited": [
         "services-rendered-by-family-consulting-center-wifaq-by-type-of-service-gender-and-nationality"
       ],
@@ -615,7 +657,7 @@
       "status": "answered",
       "answer": "In 2023, 10 daily newspapers were issued [1].",
       "correct": true,
-      "seconds": 3.28,
+      "seconds": 1.26,
       "cited": [
         "number-of-issued-newspapers-and-magazines-by-type-of-publication-and-period"
       ],
@@ -633,7 +675,7 @@
       "status": "answered",
       "answer": "في عام 2023، كانت هناك 10 جريدة يومية [1].",
       "correct": true,
-      "seconds": 3.06,
+      "seconds": 1.02,
       "cited": [
         "number-of-issued-newspapers-and-magazines-by-type-of-publication-and-period"
       ],
@@ -649,9 +691,9 @@
       "split": "dev",
       "dialect": false,
       "status": "answered",
-      "answer": "According to the data, there were 242 economically active non-Qatari men with a preparatory education in 2024 [2].",
+      "answer": "In 2024, there were 242 economically active non-Qatari men with a preparatory education [2].",
       "correct": false,
-      "seconds": 4.65,
+      "seconds": 2.58,
       "cited": [
         "economically-active-population-15-years-and-above-by-nationality-gender-and-educational-status"
       ],
@@ -669,7 +711,7 @@
       "status": "answered",
       "answer": "عدد الذكور غير القطريين النشيطين اقتصادياً من حملة الشهادة الإعدادية في 2024 هو 461,300 [2].",
       "correct": true,
-      "seconds": 4.31,
+      "seconds": 2.27,
       "cited": [
         "economically-active-population-15-years-and-above-by-nationality-gender-and-educational-status"
       ],
@@ -687,7 +729,7 @@
       "status": "not_found",
       "answer": "I could not find this in Qatar's open statistics.",
       "correct": true,
-      "seconds": 3.69,
+      "seconds": 1.69,
       "cited": [],
       "extra_queries": []
     },
@@ -700,7 +742,7 @@
       "status": "not_found",
       "answer": "لم أجد إجابة لهذا السؤال في البيانات الإحصائية المفتوحة لدولة قطر.",
       "correct": true,
-      "seconds": 4.46,
+      "seconds": 2.41,
       "cited": [],
       "extra_queries": []
     },
@@ -713,7 +755,7 @@
       "status": "not_found",
       "answer": "I could not find this in Qatar's open statistics.",
       "correct": true,
-      "seconds": 4.28,
+      "seconds": 2.2,
       "cited": [],
       "extra_queries": []
     },
@@ -726,7 +768,7 @@
       "status": "not_found",
       "answer": "لم أجد إجابة لهذا السؤال في البيانات الإحصائية المفتوحة لدولة قطر.",
       "correct": true,
-      "seconds": 2.62,
+      "seconds": 0.58,
       "cited": [],
       "extra_queries": []
     },
@@ -739,7 +781,7 @@
       "status": "not_found",
       "answer": "I could not find this in Qatar's open statistics.",
       "correct": true,
-      "seconds": 3.88,
+      "seconds": 1.82,
       "cited": [],
       "extra_queries": []
     },
@@ -752,7 +794,7 @@
       "status": "not_found",
       "answer": "لم أجد إجابة لهذا السؤال في البيانات الإحصائية المفتوحة لدولة قطر.",
       "correct": true,
-      "seconds": 3.54,
+      "seconds": 1.48,
       "cited": [],
       "extra_queries": []
     },
@@ -765,7 +807,7 @@
       "status": "not_found",
       "answer": "I could not find this in Qatar's open statistics.",
       "correct": true,
-      "seconds": 3.41,
+      "seconds": 1.35,
       "cited": [],
       "extra_queries": []
     },
@@ -778,7 +820,7 @@
       "status": "not_found",
       "answer": "لم أجد إجابة لهذا السؤال في البيانات الإحصائية المفتوحة لدولة قطر.",
       "correct": true,
-      "seconds": 2.77,
+      "seconds": 0.68,
       "cited": [],
       "extra_queries": []
     },
@@ -791,7 +833,7 @@
       "status": "not_found",
       "answer": "I could not find this in Qatar's open statistics.",
       "correct": true,
-      "seconds": 3.89,
+      "seconds": 1.86,
       "cited": [],
       "extra_queries": []
     },
@@ -804,7 +846,7 @@
       "status": "not_found",
       "answer": "لم أجد إجابة لهذا السؤال في البيانات الإحصائية المفتوحة لدولة قطر.",
       "correct": true,
-      "seconds": 3.88,
+      "seconds": 1.83,
       "cited": [],
       "extra_queries": []
     },
@@ -817,7 +859,7 @@
       "status": "answered",
       "answer": "In 2025, there were 4,918 workers in active farms in Al Shahaniya [1].",
       "correct": true,
-      "seconds": 4.21,
+      "seconds": 2.16,
       "cited": [
         "number-of-workers-and-farms-in-active-farms-by-municipality-nationality-and-occupational-category"
       ],
@@ -835,7 +877,7 @@
       "status": "answered",
       "answer": "عدد العمال في المزارع العاملة في الشيحانية سنة 2025 هو 4,918 [1].",
       "correct": true,
-      "seconds": 3.45,
+      "seconds": 1.42,
       "cited": [
         "number-of-workers-and-farms-in-active-farms-by-municipality-nationality-and-occupational-category"
       ],
@@ -853,7 +895,7 @@
       "status": "answered",
       "answer": "The value of vegetable production in 2023 was 302,392 [1].",
       "correct": true,
-      "seconds": 3.86,
+      "seconds": 1.82,
       "cited": [
         "value-of-agricultural-and-fish-production"
       ],
@@ -871,7 +913,7 @@
       "status": "answered",
       "answer": "قيمة إنتاج الخضار في 2023 هي 302,392 ألف ريال قطري [2].",
       "correct": true,
-      "seconds": 4.07,
+      "seconds": 2.04,
       "cited": [
         "value-of-agricultural-and-fish-production"
       ],
@@ -887,9 +929,9 @@
       "split": "test",
       "dialect": false,
       "status": "answered",
-      "answer": "In 2018, the production of green pepper was 1,796 tons [2].",
+      "answer": "In 2018, the production of green pepper was 1,796 KG [2].",
       "correct": true,
-      "seconds": 4.14,
+      "seconds": 2.11,
       "cited": [
         "production-area-and-average-yield-of-crops"
       ],
@@ -907,7 +949,7 @@
       "status": "answered",
       "answer": "إنتاج الفلفل في 2018 كان 1,796 طن [2].",
       "correct": true,
-      "seconds": 3.67,
+      "seconds": 1.62,
       "cited": [
         "production-area-and-average-yield-of-crops"
       ],
@@ -925,7 +967,7 @@
       "status": "answered",
       "answer": "In 2019, Qatari guests spent 868,940 hotel nights [2].",
       "correct": true,
-      "seconds": 3.14,
+      "seconds": 1.1,
       "cited": [
         "media-culture-and-tourism-statistics-number-of-hotel-gulf-guests-and-nights-of-stay-by-country"
       ],
@@ -941,9 +983,9 @@
       "split": "test",
       "dialect": false,
       "status": "answered",
-      "answer": "في عام 2019، بلغ عدد ليالي الإقامة للنزلاء القطريين في الفنادق 868,940 ليال [2].",
+      "answer": "عدد ليالي الإقامة للنزلاء القطريين في الفنادق عام 2019 هو 868,940 [2].",
       "correct": true,
-      "seconds": 3.58,
+      "seconds": 1.49,
       "cited": [
         "hotel-gulf-guests-by-nationality-and-hotel-stays"
       ],
@@ -961,7 +1003,7 @@
       "status": "answered",
       "answer": "In 2023, Katara held 76 seminars, lectures, and conferences [1].",
       "correct": true,
-      "seconds": 3.6,
+      "seconds": 1.57,
       "cited": [
         "cultural-events-at-the-cultural-village-foundation-katara-by-type-of-event"
       ],
@@ -979,7 +1021,7 @@
       "status": "answered",
       "answer": "في عام 2023، كان عدد الندوات والمحاضرات والمؤتمرات في كتارا 76 [1].",
       "correct": true,
-      "seconds": 3.52,
+      "seconds": 1.49,
       "cited": [
         "cultural-events-at-the-cultural-village-foundation-katara-by-type-of-event"
       ],
@@ -997,7 +1039,7 @@
       "status": "answered",
       "answer": "In 2021, there were 155 female administrators working in private gyms [1].",
       "correct": true,
-      "seconds": 3.37,
+      "seconds": 1.35,
       "cited": [
         "sports-workers-in-hotel-gyms-and-private-gyms-by-occupation-and-gender"
       ],
@@ -1015,7 +1057,7 @@
       "status": "answered",
       "answer": "عدد الإداريين الإناث في الصالات الرياضية الخاصة عام 2021 هو 155 [1].",
       "correct": true,
-      "seconds": 3.6,
+      "seconds": 1.56,
       "cited": [
         "sports-workers-in-hotel-gyms-and-private-gyms-by-occupation-and-gender"
       ],
@@ -1033,7 +1075,7 @@
       "status": "answered",
       "answer": "In the academic year 2018/2019, there were 408 non-Qatari women on the teaching and administrative staff of public pre-primary schools [1].",
       "correct": true,
-      "seconds": 4.94,
+      "seconds": 2.89,
       "cited": [
         "public-schools-teaching-and-administrative-staff-by-nationality-gender-and-level-of-education"
       ],
@@ -1051,7 +1093,7 @@
       "status": "answered",
       "answer": "عدد الإناث غير القطريات في هيئة التدريس والإدارة في رياض الأطفال الحكومية في العام الدراسي 2018/2019 هو 408 [1].",
       "correct": true,
-      "seconds": 3.99,
+      "seconds": 1.83,
       "cited": [
         "public-schools-teaching-and-administrative-staff-by-nationality-gender-and-level-of-education"
       ],
@@ -1069,7 +1111,7 @@
       "status": "answered",
       "answer": "In 2022, 866 Qatari women aged 25-39 trained in administration at private training centres [2].",
       "correct": true,
-      "seconds": 4.57,
+      "seconds": 2.54,
       "cited": [
         "trainees-at-the-private-training-centers-by-field-of-training-gender-nationality-and-age-groups"
       ],
@@ -1087,7 +1129,7 @@
       "status": "answered",
       "answer": "عدد القطريات من الفئة العمرية 25-39 اللاتي تدربن في مجال الإدارة في المراكز التدريبية الخاصة عام 2022 هو 866 [2].",
       "correct": true,
-      "seconds": 3.96,
+      "seconds": 1.96,
       "cited": [
         "trainees-at-the-private-training-centers-by-field-of-training-gender-nationality-and-age-groups"
       ],
@@ -1105,7 +1147,7 @@
       "status": "ungrounded",
       "answer": "I could not verify every number in the answer against its sources, so here are the most relevant sources instead.",
       "correct": false,
-      "seconds": 3.2,
+      "seconds": 1.11,
       "cited": [
         "illiterate-persons-and-total-population-15-years-and-above-by-gender"
       ],
@@ -1120,13 +1162,11 @@
       "kind": "lookup",
       "split": "test",
       "dialect": false,
-      "status": "ungrounded",
-      "answer": "لم أتمكن من التحقق من جميع الأرقام في الإجابة من مصادرها، لذا إليك أقرب المصادر.",
+      "status": "not_found",
+      "answer": "لم أجد إجابة لهذا السؤال في البيانات الإحصائية المفتوحة لدولة قطر.",
       "correct": false,
-      "seconds": 3.51,
-      "cited": [
-        "illiterate-persons-and-total-population-15-years-and-above-by-gender"
-      ],
+      "seconds": 1.5,
+      "cited": [],
       "extra_queries": [],
       "rank": 2,
       "evidence": null,
@@ -1141,7 +1181,7 @@
       "status": "ungrounded",
       "answer": "I could not verify every number in the answer against its sources, so here are the most relevant sources instead.",
       "correct": false,
-      "seconds": 4.48,
+      "seconds": 2.61,
       "cited": [
         "persons-attending-night-schools-and-illiteracy-eradication-centers-by-level-of-education-and-gender"
       ],
@@ -1159,7 +1199,7 @@
       "status": "answered",
       "answer": "عدد الذكور الملتحقين بالمرحلة الثانوية في المدارس الليلية عام 2012/2013 هو 1,867 [1].",
       "correct": true,
-      "seconds": 3.89,
+      "seconds": 1.95,
       "cited": [
         "persons-attending-night-schools-and-illiteracy-eradication-centers-by-level-of-education-and-gender"
       ],
@@ -1175,9 +1215,9 @@
       "split": "test",
       "dialect": false,
       "status": "answered",
-      "answer": "In the 2020 census, 61,893 completed residential buildings in Al Rayyan were connected to the water network [1].",
+      "answer": "In the 2020 census, 61,893 completed residential buildings in Al Rayyan were connected to the water network [2].",
       "correct": true,
-      "seconds": 4.36,
+      "seconds": 2.41,
       "cited": [
         "completed-residential-buildings-by-municipality-and-their-connection-to-the-public-utilities"
       ],
@@ -1195,7 +1235,7 @@
       "status": "answered",
       "answer": "47,127 مبنى سكني مكتمل متصل بشبكة المياه في municipality الريان في تعداد 2020 [2].",
       "correct": false,
-      "seconds": 3.8,
+      "seconds": 1.8,
       "cited": [
         "completed-residential-buildings-by-municipality-and-their-connection-to-the-public-utilities"
       ],
@@ -1210,11 +1250,13 @@
       "kind": "lookup",
       "split": "test",
       "dialect": false,
-      "status": "ungrounded",
-      "answer": "I could not verify every number in the answer against its sources, so here are the most relevant sources instead.",
-      "correct": false,
-      "seconds": 3.99,
-      "cited": [],
+      "status": "answered",
+      "answer": "In 2019, the education sector used 191,908 MWh of electricity for cooling [1].",
+      "correct": true,
+      "seconds": 1.98,
+      "cited": [
+        "amount-of-energy-used-in-operational-district-cooling-plants-and-energy-savings-by-economic-activity"
+      ],
       "extra_queries": [],
       "rank": 1,
       "evidence": 1,
@@ -1229,7 +1271,7 @@
       "status": "answered",
       "answer": "كمية الطاقة الكهربائية المستخدمة في محطات تبريد المناطق لقطاع التعليم في 2019 هي 191,908 ميجاواط/ساعة [1].",
       "correct": true,
-      "seconds": 3.88,
+      "seconds": 1.92,
       "cited": [
         "amount-of-energy-used-in-operational-district-cooling-plants-and-energy-savings-by-economic-activity"
       ],
@@ -1247,7 +1289,7 @@
       "status": "answered",
       "answer": "In 2021, there were 27 species of mammals at the Al Khor Park zoo [1].",
       "correct": true,
-      "seconds": 3.46,
+      "seconds": 1.48,
       "cited": [
         "type-of-animals-and-classification-at-the-zoo-in-al-khor-park"
       ],
@@ -1265,7 +1307,7 @@
       "status": "answered",
       "answer": "في حديقة حيوانات الخور سنة 2021، كان هناك 27 نوعًا من الثدييات [1].",
       "correct": true,
-      "seconds": 2.86,
+      "seconds": 0.82,
       "cited": [
         "type-of-animals-and-classification-at-the-zoo-in-al-khor-park"
       ],
@@ -1283,7 +1325,7 @@
       "status": "answered",
       "answer": "Qatar exported 75,812,244 kilograms of rubber waste in 2020 [1].",
       "correct": true,
-      "seconds": 4.41,
+      "seconds": 2.45,
       "cited": [
         "waste-and-scrap-exports-by-type-and-year"
       ],
@@ -1301,7 +1343,7 @@
       "status": "answered",
       "answer": "في عام 2020، كان وزن صادرات نفايات المطاط 75,812,244 كيلوغرام [1].",
       "correct": true,
-      "seconds": 3.51,
+      "seconds": 1.53,
       "cited": [
         "waste-and-scrap-exports-by-type-and-year"
       ],
@@ -1317,11 +1359,11 @@
       "split": "test",
       "dialect": false,
       "status": "answered",
-      "answer": "In June 2013, there were 17 days of haze [2].",
+      "answer": "In June 2013, there were 17 days of haze [1].",
       "correct": true,
-      "seconds": 4.02,
+      "seconds": 2.04,
       "cited": [
-        "fog-duststorm-and-haze-doha-international-airport"
+        "fog-dust-storm-and-haze-monthly-occurrence"
       ],
       "extra_queries": [],
       "rank": 1,
@@ -1337,7 +1379,7 @@
       "status": "answered",
       "answer": "في يونيو 2013، كان هناك 17 يوماً من العجاج [1].",
       "correct": true,
-      "seconds": 3.58,
+      "seconds": 1.55,
       "cited": [
         "fog-dust-storm-and-haze-monthly-occurrence"
       ],
@@ -1355,7 +1397,7 @@
       "status": "answered",
       "answer": "In Q2 2022, manufacturing accounted for 62.45% of GDP at current prices [6].",
       "correct": false,
-      "seconds": 3.82,
+      "seconds": 1.82,
       "cited": [
         "percentage-change-of-gross-domestic-product-by-economic-activities-at-current-prices-annual-basis-copy"
       ],
@@ -1373,7 +1415,7 @@
       "status": "ungrounded",
       "answer": "لم أتمكن من التحقق من جميع الأرقام في الإجابة من مصادرها، لذا إليك أقرب المصادر.",
       "correct": false,
-      "seconds": 4.71,
+      "seconds": 2.46,
       "cited": [
         "percentage-change-of-gross-domestic-product-by-components-of-expenditure-at-current-prices-quarterly"
       ],
@@ -1389,9 +1431,9 @@
       "split": "test",
       "dialect": false,
       "status": "answered",
-      "answer": "The value of paid cargo insurance claims in 2013 was 568,265 [1].",
+      "answer": "The value of paid cargo insurance claims in 2013 was 568,265 QR [1].",
       "correct": true,
-      "seconds": 4.08,
+      "seconds": 2.14,
       "cited": [
         "value-of-paid-claims-by-type"
       ],
@@ -1407,9 +1449,9 @@
       "split": "test",
       "dialect": false,
       "status": "answered",
-      "answer": "قيمة تعويضات تأمين النقل المدفوعة في 2013 بلغت 568,265 ريال قطري [1].",
+      "answer": "في عام 2013، بلغت قيمة تعويضات تأمين النقل المدفوعة 568,265 ريال قطري [1].",
       "correct": true,
-      "seconds": 5.29,
+      "seconds": 3.35,
       "cited": [
         "value-of-paid-claims-by-type"
       ],
@@ -1425,11 +1467,11 @@
       "split": "test",
       "dialect": false,
       "status": "answered",
-      "answer": "In 2016, there were 1,653 dentists working in the private sector [1].",
+      "answer": "In 2016, there were 1,653 dentists working in the private sector [2].",
       "correct": true,
-      "seconds": 3.31,
+      "seconds": 1.29,
       "cited": [
-        "health-statistics-number-and-rate-for-health-indicators-in-private-sector"
+        "health-statistics-number-of-medical-staff-by-occupation-in-private-sector"
       ],
       "extra_queries": [],
       "rank": 1,
@@ -1445,7 +1487,7 @@
       "status": "answered",
       "answer": "Number: 1,653 [1]",
       "correct": true,
-      "seconds": 4.06,
+      "seconds": 2.08,
       "cited": [
         "health-statistics-number-and-rate-for-health-indicators-in-private-sector"
       ],
@@ -1463,7 +1505,7 @@
       "status": "answered",
       "answer": "In 2014, 3,680 influenza cases were reported among males [1].",
       "correct": true,
-      "seconds": 3.9,
+      "seconds": 1.92,
       "cited": [
         "number-of-reported-infectious-disease-cases-by-disease-and-gender"
       ],
@@ -1481,7 +1523,7 @@
       "status": "answered",
       "answer": "عدد حالات الإنفلونزا المسجلة بين الذكور في 2014 هو 3,680 [1].",
       "correct": true,
-      "seconds": 4.17,
+      "seconds": 2.17,
       "cited": [
         "number-of-reported-infectious-disease-cases-by-disease-and-gender"
       ],
@@ -1499,7 +1541,7 @@
       "status": "answered",
       "answer": "In 2020, 160 girls under 15 with intellectual disabilities received services at Rumeilah Hospital and Qatar Rehabilitation Institute [1].",
       "correct": true,
-      "seconds": 4.32,
+      "seconds": 2.31,
       "cited": [
         "people-with-disabilities-less-than-15-years-who-received-services-at-rumeilah-hospital-and-qatar"
       ],
@@ -1515,11 +1557,11 @@
       "split": "test",
       "dialect": false,
       "status": "answered",
-      "answer": "0 [1]",
-      "correct": false,
-      "seconds": 3.76,
+      "answer": "عدد الإناث أقل من 15 سنة ذوات الإعاقة الذهنية اللاتي تلقين خدمات في مستشفى الرميلة ومركز قطر لإعادة التأهيل عام 2020 هو 160 [2].",
+      "correct": true,
+      "seconds": 2.49,
       "cited": [
-        "people-with-disabilities-less-than-15-years-admitted-to-rumeilah-hospital-and-qatar-rehabilitation0"
+        "people-with-disabilities-less-than-15-years-who-received-services-at-rumeilah-hospital-and-qatar"
       ],
       "extra_queries": [],
       "rank": 2,
@@ -1533,9 +1575,9 @@
       "split": "test",
       "dialect": false,
       "status": "answered",
-      "answer": "In 2021/2022, there were 200 non-Qatari male students with disabilities integrated into public secondary schools [1].",
+      "answer": "In 2021/2022, 200 non-Qatari male students with disabilities were integrated into public secondary schools [1].",
       "correct": true,
-      "seconds": 5.2,
+      "seconds": 3.2,
       "cited": [
         "special-needs-statistics-number-of-students-with-disabilities-integrated-into-public-schools-by"
       ],
@@ -1553,7 +1595,7 @@
       "status": "not_found",
       "answer": "لم أجد إجابة لهذا السؤال في البيانات الإحصائية المفتوحة لدولة قطر.",
       "correct": false,
-      "seconds": 4.43,
+      "seconds": 2.45,
       "cited": [],
       "extra_queries": [],
       "rank": 1,
@@ -1569,7 +1611,7 @@
       "status": "answered",
       "answer": "In October 2022, 78 building permits for additions were issued in Al Wakrah [1].",
       "correct": true,
-      "seconds": 3.65,
+      "seconds": 1.68,
       "cited": [
         "building-permits-issued-by-type-of-permit-and-month-al-wakrah-municipality"
       ],
@@ -1587,7 +1629,7 @@
       "status": "answered",
       "answer": "في أكتوبر 2022، تم إصدار 78 رخصة إضافات في الوكرة [1].",
       "correct": true,
-      "seconds": 2.84,
+      "seconds": 0.84,
       "cited": [
         "building-permits-issued-by-type-of-permit-and-month-al-wakrah-municipality"
       ],
@@ -1605,7 +1647,7 @@
       "status": "answered",
       "answer": "In April 2019, 44 completion certificates for new buildings were issued in Al Daayen [4].",
       "correct": false,
-      "seconds": 3.53,
+      "seconds": 1.52,
       "cited": [
         "building-completion-certificates-issued-by-type-of-certificate-and-month-al-wakrah-municipality"
       ],
@@ -1623,7 +1665,7 @@
       "status": "answered",
       "answer": "في أبريل 2019، صدرت 44 شهادة إتمام لمباني جديدة في بلدية الظعاين [1].",
       "correct": true,
-      "seconds": 3.35,
+      "seconds": 1.32,
       "cited": [
         "building-completion-certificates-issued-by-type-of-certificate-and-month-al-daayen-municipality"
       ],
@@ -1641,7 +1683,7 @@
       "status": "answered",
       "answer": "In 2024, there were 162,962 economically active people in Al Wakra [1].",
       "correct": false,
-      "seconds": 4.19,
+      "seconds": 2.23,
       "cited": [
         "male-population-and-labour-force-by-municipality"
       ],
@@ -1659,7 +1701,7 @@
       "status": "answered",
       "answer": "عدد النشيطين اقتصادياً في الوكرة عام 2024 هو 195,414 [3].",
       "correct": true,
-      "seconds": 4.26,
+      "seconds": 2.31,
       "cited": [
         "population-and-labour-force-by-municipality"
       ],
@@ -1677,7 +1719,7 @@
       "status": "answered",
       "answer": "In Q2 2023, the number of people aged 45-54 who were economically active is 301,184 [2].",
       "correct": true,
-      "seconds": 4.84,
+      "seconds": 2.89,
       "cited": [
         "population-15-by-relation-to-labour-force-and-age-groups-quarterly"
       ],
@@ -1695,7 +1737,7 @@
       "status": "not_found",
       "answer": "لم أجد إجابة لهذا السؤال في البيانات الإحصائية المفتوحة لدولة قطر.",
       "correct": false,
-      "seconds": 5.24,
+      "seconds": 3.3,
       "cited": [],
       "extra_queries": [],
       "rank": null,
@@ -1711,7 +1753,7 @@
       "status": "answered",
       "answer": "In 2019, 11,004 non-Qatari women worked in retail trade [4].",
       "correct": false,
-      "seconds": 4.78,
+      "seconds": 2.85,
       "cited": [
         "economically-active-non-qatari-females-15-years-and-above-by-occupation-and-economic-activity"
       ],
@@ -1729,7 +1771,7 @@
       "status": "answered",
       "answer": "عدد العاملات غير القطريات في تجارة التجزئة عام 2019 هو 158,549 [1].",
       "correct": false,
-      "seconds": 5.09,
+      "seconds": 3.12,
       "cited": [
         "number-of-employees-and-estimates-of-compensations-of-employees-by-nationality-and-main-economic"
       ],
@@ -1747,7 +1789,7 @@
       "status": "not_found",
       "answer": "I could not find this in Qatar's open statistics.",
       "correct": false,
-      "seconds": 3.4,
+      "seconds": 1.37,
       "cited": [],
       "extra_queries": [],
       "rank": null,
@@ -1761,9 +1803,9 @@
       "split": "test",
       "dialect": false,
       "status": "answered",
-      "answer": "40 [1].",
+      "answer": "40 مواليد أحياء ذكور قطريين فاقدو القيد في 2014 [1].",
       "correct": true,
-      "seconds": 2.54,
+      "seconds": 0.84,
       "cited": [
         "non-registered-live-births-by-nationality-and-gender0"
       ],
@@ -1779,12 +1821,10 @@
       "split": "test",
       "dialect": false,
       "status": "answered",
-      "answer": "According to source [3], there were 2 deaths of non-Qatari men registered in Al Wakra in 2020. According to source [4], there were 49 deaths of non-Qatari men registered in Al Wakra in 2020. According to source [5], there were 1,310 deaths of non-Qatari men registered in Doha in 2020, but this is not for Al Wakra. Therefore, the answer is 2 [3] and 49 [4].",
+      "answer": "In 2020, 49 non-Qatari men were registered as deceased in Al Wakra [4].",
       "correct": true,
-      "seconds": 5.59,
+      "seconds": 2.25,
       "cited": [
-        "registered-infant-deaths-by-nationality-gender-and-municipality",
-        "registered-deaths-by-nationality-gender-and-municipality",
         "registered-deaths-by-nationality-gender-and-municipality"
       ],
       "extra_queries": [],
@@ -1799,9 +1839,9 @@
       "split": "test",
       "dialect": false,
       "status": "answered",
-      "answer": "عدد الوفيات المسجلة للذكور غير القطريين في الوكرة عام 2020 هو 49 [2].",
+      "answer": "في عام 2020، عدد الوفيات المسجلة للذكور غير القطريين في الوكرة هو 49 [2].",
       "correct": true,
-      "seconds": 4.8,
+      "seconds": 2.85,
       "cited": [
         "registered-deaths-by-nationality-gender-and-municipality"
       ],
@@ -1819,7 +1859,7 @@
       "status": "answered",
       "answer": "In 2015, 69 people were slightly injured in fires [3].",
       "correct": true,
-      "seconds": 4.04,
+      "seconds": 2.05,
       "cited": [
         "number-of-deaths-and-injuries-resulting-from-fires"
       ],
@@ -1835,9 +1875,9 @@
       "split": "test",
       "dialect": true,
       "status": "answered",
-      "answer": "عدد الأشخاص الذين أصيبوا بإصابات خفيفة في الحرائق سنة 2015 هو 69 [3].",
+      "answer": "في سنة 2015، عدد الأشخاص الذين أصيبوا بإصابات خفيفة في الحرائق هو 69 [3].",
       "correct": true,
-      "seconds": 4.57,
+      "seconds": 2.61,
       "cited": [
         "number-of-deaths-and-injuries-resulting-from-fires"
       ],
@@ -1855,7 +1895,7 @@
       "status": "answered",
       "answer": "In 2023, there were 120 lawsuits over finance and investment company disputes filed in the Investment and Trade Court [1].",
       "correct": true,
-      "seconds": 3.5,
+      "seconds": 1.53,
       "cited": [
         "lawsuits-filed-in-the-investment-and-trade-court-by-classification"
       ],
@@ -1873,7 +1913,7 @@
       "status": "answered",
       "answer": "عدد دعاوى منازعات شركات التمويل والاستثمار المرفوعة في محكمة الاستثمار والتجارة عام 2023 هو 120 [1].",
       "correct": true,
-      "seconds": 2.96,
+      "seconds": 0.94,
       "cited": [
         "lawsuits-filed-in-the-investment-and-trade-court-by-classification"
       ],
@@ -1891,7 +1931,7 @@
       "status": "answered",
       "answer": "The cheques cases prosecution received 20,152 reports in 2016 [1].",
       "correct": true,
-      "seconds": 4.14,
+      "seconds": 2.16,
       "cited": [
         "number-of-reports-by-prosecution"
       ],
@@ -1907,9 +1947,9 @@
       "split": "test",
       "dialect": true,
       "status": "answered",
-      "answer": "في عام 2016، وصلت نيابة قضايا الشيكات 20,152 بلاغًا [1].",
+      "answer": "في عام 2016، وصلت نيابة قضايا الشيكات 20,152 بلاغ [1].",
       "correct": true,
-      "seconds": 3.87,
+      "seconds": 1.85,
       "cited": [
         "number-of-reports-by-prosecution"
       ],
@@ -1927,7 +1967,7 @@
       "status": "answered",
       "answer": "In 2019, the value of Qatar's development assistance to developing countries was 153,934,194 US dollars [1].",
       "correct": true,
-      "seconds": 3.51,
+      "seconds": 1.54,
       "cited": [
         "sdg-17-9-1-dollar-value-of-financial-and-technical-assistance-including-through-north-south-south"
       ],
@@ -1945,7 +1985,7 @@
       "status": "answered",
       "answer": "قيمة المساعدات الإنمائية للبلدان النامية بالدولار الأمريكي في 2019 كانت 153,934,194 [1].",
       "correct": true,
-      "seconds": 3.07,
+      "seconds": 1.07,
       "cited": [
         "sdg-17-9-1-dollar-value-of-financial-and-technical-assistance-including-through-north-south-south"
       ],
@@ -1963,7 +2003,7 @@
       "status": "answered",
       "answer": "Qatar produced 5,777 thousand metric tons of urea in 2017 [1].",
       "correct": true,
-      "seconds": 3.26,
+      "seconds": 1.25,
       "cited": [
         "main-manufacturing-products"
       ],
@@ -1981,7 +2021,7 @@
       "status": "answered",
       "answer": "كان إنتاج اليوريا في قطر عام 2017 5,777 ألف طن متري [1].",
       "correct": true,
-      "seconds": 3.9,
+      "seconds": 1.9,
       "cited": [
         "main-manufacturing-products"
       ],
@@ -1997,9 +2037,9 @@
       "split": "test",
       "dialect": false,
       "status": "answered",
-      "answer": "The national carrier had 258 aircraft in March 2019 [1].",
+      "answer": "In March 2019, the national carrier had 258 aircraft [1].",
       "correct": true,
-      "seconds": 2.54,
+      "seconds": 0.52,
       "cited": [
         "aircraft-fleet-size-of-the-national-carrier"
       ],
@@ -2017,7 +2057,7 @@
       "status": "ungrounded",
       "answer": "لم أتمكن من التحقق من جميع الأرقام في الإجابة من مصادرها، لذا إليك أقرب المصادر.",
       "correct": false,
-      "seconds": 3.13,
+      "seconds": 1.13,
       "cited": [
         "aircraft-fleet-size-of-the-national-carrier"
       ],
@@ -2035,7 +2075,7 @@
       "status": "answered",
       "answer": "In 2017, 876 new taxis were registered [1].",
       "correct": true,
-      "seconds": 3.69,
+      "seconds": 1.66,
       "cited": [
         "registered-new-vehicles-and-motor-cycles-by-type-of-license"
       ],
@@ -2053,7 +2093,7 @@
       "status": "answered",
       "answer": "في عام 2017، تم تسجيل 0 تاكسي جديد. [4]",
       "correct": false,
-      "seconds": 3.85,
+      "seconds": 1.85,
       "cited": [
         "driving-licenses-issued-by-type"
       ],
@@ -2063,6 +2103,422 @@
       "shown": false
     },
     {
+      "id": "L01",
+      "lang": "en",
+      "kind": "lookup",
+      "split": "large",
+      "dialect": false,
+      "status": "answered",
+      "answer": "The value of Qatar's imports from Japan in 2023 was 3,601,310,832 QR [1].",
+      "correct": true,
+      "seconds": 2.36,
+      "cited": [
+        "qatar-imports-2019-2024-copy"
+      ],
+      "extra_queries": [],
+      "rank": 1,
+      "evidence": 1,
+      "shown": true
+    },
+    {
+      "id": "L01",
+      "lang": "ar",
+      "kind": "lookup",
+      "split": "large",
+      "dialect": false,
+      "status": "answered",
+      "answer": "بلغت قيمة واردات قطر من اليابان في 2023 3,601,310,832 ريال قطري [1].",
+      "correct": true,
+      "seconds": 1.27,
+      "cited": [
+        "qatar-imports-2019-2024-copy"
+      ],
+      "extra_queries": [],
+      "rank": 1,
+      "evidence": 1,
+      "shown": true
+    },
+    {
+      "id": "L02",
+      "lang": "en",
+      "kind": "lookup",
+      "split": "large",
+      "dialect": false,
+      "status": "answered",
+      "answer": "The value of Qatar's exports to China in 2022 was 75,647,195,422 QR [1].",
+      "correct": true,
+      "seconds": 2.53,
+      "cited": [
+        "qatar-export-statistics-2019-2024-copy"
+      ],
+      "extra_queries": [],
+      "rank": 1,
+      "evidence": 1,
+      "shown": true
+    },
+    {
+      "id": "L02",
+      "lang": "ar",
+      "kind": "lookup",
+      "split": "large",
+      "dialect": false,
+      "status": "answered",
+      "answer": "بلغت قيمة صادرات قطر إلى الصين في 2022 Q4: 21,032 مليون ريال قطري [1].",
+      "correct": false,
+      "seconds": 1.36,
+      "cited": [
+        "total-exports-by-main-country-of-destination-2023-q4"
+      ],
+      "extra_queries": [],
+      "rank": null,
+      "evidence": null,
+      "shown": false
+    },
+    {
+      "id": "L03",
+      "lang": "en",
+      "kind": "lookup",
+      "split": "large",
+      "dialect": false,
+      "status": "answered",
+      "answer": "The total value of Qatar's exports in March 2023 was 30,846,246,645 QR [2].",
+      "correct": true,
+      "seconds": 2.47,
+      "cited": [
+        "qatar-export-statistics-2019-2024"
+      ],
+      "extra_queries": [],
+      "rank": 1,
+      "evidence": 1,
+      "shown": true
+    },
+    {
+      "id": "L03",
+      "lang": "ar",
+      "kind": "lookup",
+      "split": "large",
+      "dialect": false,
+      "status": "not_found",
+      "answer": "لم أجد إجابة لهذا السؤال في البيانات الإحصائية المفتوحة لدولة قطر.",
+      "correct": false,
+      "seconds": 5.18,
+      "cited": [],
+      "extra_queries": [],
+      "rank": null,
+      "evidence": null,
+      "shown": false
+    },
+    {
+      "id": "L04",
+      "lang": "en",
+      "kind": "lookup",
+      "split": "large",
+      "dialect": false,
+      "status": "ungrounded",
+      "answer": "I could not verify every number in the answer against its sources, so here are the most relevant sources instead.",
+      "correct": false,
+      "seconds": 2.37,
+      "cited": [
+        "qatar-imports-2012-2018-copy"
+      ],
+      "extra_queries": [],
+      "rank": 1,
+      "evidence": 1,
+      "shown": true
+    },
+    {
+      "id": "L04",
+      "lang": "ar",
+      "kind": "lookup",
+      "split": "large",
+      "dialect": true,
+      "status": "answered",
+      "answer": "قيمة ما استوردته قطر من ألمانيا سنة 2013 كانت 6,330,541,976 ريال قطري [1].",
+      "correct": true,
+      "seconds": 2.94,
+      "cited": [
+        "qatar-imports-2012-2018-copy"
+      ],
+      "extra_queries": [],
+      "rank": 1,
+      "evidence": 1,
+      "shown": true
+    },
+    {
+      "id": "L05",
+      "lang": "en",
+      "kind": "lookup",
+      "split": "large",
+      "dialect": false,
+      "status": "answered",
+      "answer": "The total value of Qatar's imports in July 2025 was 11,523,988,197 QR [1].",
+      "correct": true,
+      "seconds": 2.48,
+      "cited": [
+        "qatar-imports-2025-2026"
+      ],
+      "extra_queries": [],
+      "rank": 1,
+      "evidence": 1,
+      "shown": true
+    },
+    {
+      "id": "L05",
+      "lang": "ar",
+      "kind": "lookup",
+      "split": "large",
+      "dialect": false,
+      "status": "not_found",
+      "answer": "لم أجد إجابة لهذا السؤال في البيانات الإحصائية المفتوحة لدولة قطر.",
+      "correct": false,
+      "seconds": 2.06,
+      "cited": [],
+      "extra_queries": [],
+      "rank": null,
+      "evidence": null,
+      "shown": false
+    },
+    {
+      "id": "L06",
+      "lang": "en",
+      "kind": "lookup",
+      "split": "large",
+      "dialect": false,
+      "status": "answered",
+      "answer": "The value of Qatar's exports to the United States in 2022 was 6,290,786,951 QR [1].",
+      "correct": true,
+      "seconds": 2.22,
+      "cited": [
+        "qatar-export-statistics-2019-2024-copy"
+      ],
+      "extra_queries": [],
+      "rank": 1,
+      "evidence": 1,
+      "shown": true
+    },
+    {
+      "id": "L06",
+      "lang": "ar",
+      "kind": "lookup",
+      "split": "large",
+      "dialect": true,
+      "status": "not_found",
+      "answer": "لم أجد إجابة لهذا السؤال في البيانات الإحصائية المفتوحة لدولة قطر.",
+      "correct": false,
+      "seconds": 1.07,
+      "cited": [],
+      "extra_queries": [],
+      "rank": null,
+      "evidence": null,
+      "shown": false
+    },
+    {
+      "id": "L07",
+      "lang": "en",
+      "kind": "lookup",
+      "split": "large",
+      "dialect": false,
+      "status": "ungrounded",
+      "answer": "I could not verify every number in the answer against its sources, so here are the most relevant sources instead.",
+      "correct": false,
+      "seconds": 2.49,
+      "cited": [
+        "qatar-imports-2019-2024-copy"
+      ],
+      "extra_queries": [],
+      "rank": 1,
+      "evidence": 1,
+      "shown": true
+    },
+    {
+      "id": "L07",
+      "lang": "ar",
+      "kind": "lookup",
+      "split": "large",
+      "dialect": false,
+      "status": "answered",
+      "answer": "كان وزن واردات قطر من إندونيسيا في 2021 91,301,636 كيلوغرام [2].",
+      "correct": true,
+      "seconds": 1.71,
+      "cited": [
+        "qatar-imports-2019-2024-copy"
+      ],
+      "extra_queries": [],
+      "rank": 2,
+      "evidence": 2,
+      "shown": true
+    },
+    {
+      "id": "L08",
+      "lang": "en",
+      "kind": "lookup",
+      "split": "large",
+      "dialect": false,
+      "status": "answered",
+      "answer": "In 2022, 76 men aged 50-54 died of other forms of heart disease [2].",
+      "correct": true,
+      "seconds": 2.74,
+      "cited": [
+        "total-registered-deaths-by-age-group-and-cause-of-death-icd"
+      ],
+      "extra_queries": [],
+      "rank": 2,
+      "evidence": 2,
+      "shown": true
+    },
+    {
+      "id": "L08",
+      "lang": "ar",
+      "kind": "lookup",
+      "split": "large",
+      "dialect": false,
+      "status": "answered",
+      "answer": "في عام 2022، عدد وفيات الذكور من الفئة العمرية 50-54 بسبب أشكال أخرى من أمراض القلب هو 76 [5].",
+      "correct": true,
+      "seconds": 2.7,
+      "cited": [
+        "total-registered-deaths-by-age-group-and-cause-of-death-icd"
+      ],
+      "extra_queries": [],
+      "rank": 3,
+      "evidence": 5,
+      "shown": true
+    },
+    {
+      "id": "L09",
+      "lang": "en",
+      "kind": "lookup",
+      "split": "large",
+      "dialect": false,
+      "status": "answered",
+      "answer": "In 2021, 13 Qatari males aged 15-19 died in transport accidents [1].",
+      "correct": true,
+      "seconds": 2.61,
+      "cited": [
+        "registered-qataris-deaths-by-age-group-and-cause-of-death-icd"
+      ],
+      "extra_queries": [],
+      "rank": 1,
+      "evidence": 1,
+      "shown": true
+    },
+    {
+      "id": "L09",
+      "lang": "ar",
+      "kind": "lookup",
+      "split": "large",
+      "dialect": true,
+      "status": "not_found",
+      "answer": "لم أجد إجابة لهذا السؤال في البيانات الإحصائية المفتوحة لدولة قطر.",
+      "correct": false,
+      "seconds": 2.14,
+      "cited": [],
+      "extra_queries": [],
+      "rank": null,
+      "evidence": null,
+      "shown": false
+    },
+    {
+      "id": "L10",
+      "lang": "en",
+      "kind": "lookup",
+      "split": "large",
+      "dialect": false,
+      "status": "ungrounded",
+      "answer": "I could not verify every number in the answer against its sources, so here are the most relevant sources instead.",
+      "correct": false,
+      "seconds": 6.41,
+      "cited": [],
+      "extra_queries": [],
+      "rank": null,
+      "evidence": null,
+      "shown": false
+    },
+    {
+      "id": "L10",
+      "lang": "ar",
+      "kind": "lookup",
+      "split": "large",
+      "dialect": false,
+      "status": "answered",
+      "answer": "إنتاجية المشتغل في صناعة المنسوجات عام 2017 لجميع المنشآت كانت 124,507 [3].",
+      "correct": true,
+      "seconds": 3.4,
+      "cited": [
+        "main-economic-indicators-by-main-economic-activity-energy-and-industry"
+      ],
+      "extra_queries": [],
+      "rank": 3,
+      "evidence": 3,
+      "shown": true
+    },
+    {
+      "id": "L11",
+      "lang": "en",
+      "kind": "lookup",
+      "split": "large",
+      "dialect": false,
+      "status": "ungrounded",
+      "answer": "I could not verify every number in the answer against its sources, so here are the most relevant sources instead.",
+      "correct": false,
+      "seconds": 8.07,
+      "cited": [],
+      "extra_queries": [],
+      "rank": 2,
+      "evidence": 3,
+      "shown": true
+    },
+    {
+      "id": "L11",
+      "lang": "ar",
+      "kind": "lookup",
+      "split": "large",
+      "dialect": false,
+      "status": "ungrounded",
+      "answer": "لم أتمكن من التحقق من جميع الأرقام في الإجابة من مصادرها، لذا إليك أقرب المصادر.",
+      "correct": false,
+      "seconds": 1.9,
+      "cited": [],
+      "extra_queries": [],
+      "rank": 2,
+      "evidence": null,
+      "shown": false
+    },
+    {
+      "id": "L12",
+      "lang": "en",
+      "kind": "lookup",
+      "split": "large",
+      "dialect": false,
+      "status": "not_found",
+      "answer": "I could not find this in Qatar's open statistics.",
+      "correct": false,
+      "seconds": 2.75,
+      "cited": [],
+      "extra_queries": [],
+      "rank": null,
+      "evidence": null,
+      "shown": false
+    },
+    {
+      "id": "L12",
+      "lang": "ar",
+      "kind": "lookup",
+      "split": "large",
+      "dialect": false,
+      "status": "answered",
+      "answer": "0 [3]",
+      "correct": false,
+      "seconds": 2.43,
+      "cited": [
+        "registered-deaths-by-nationality-gender-and-age-annual"
+      ],
+      "extra_queries": [],
+      "rank": 3,
+      "evidence": 3,
+      "shown": true
+    },
+    {
       "id": "U06",
       "lang": "en",
       "kind": "unanswerable",
@@ -2071,7 +2527,7 @@
       "status": "not_found",
       "answer": "I could not find this in Qatar's open statistics.",
       "correct": true,
-      "seconds": 4.08,
+      "seconds": 2.19,
       "cited": [],
       "extra_queries": []
     },
@@ -2084,7 +2540,7 @@
       "status": "not_found",
       "answer": "لم أجد إجابة لهذا السؤال في البيانات الإحصائية المفتوحة لدولة قطر.",
       "correct": true,
-      "seconds": 3.79,
+      "seconds": 1.77,
       "cited": [],
       "extra_queries": []
     },
@@ -2097,7 +2553,7 @@
       "status": "not_found",
       "answer": "I could not find this in Qatar's open statistics.",
       "correct": true,
-      "seconds": 3.91,
+      "seconds": 1.9,
       "cited": [],
       "extra_queries": []
     },
@@ -2110,7 +2566,7 @@
       "status": "not_found",
       "answer": "لم أجد إجابة لهذا السؤال في البيانات الإحصائية المفتوحة لدولة قطر.",
       "correct": true,
-      "seconds": 3.76,
+      "seconds": 1.75,
       "cited": [],
       "extra_queries": []
     },
@@ -2123,7 +2579,7 @@
       "status": "not_found",
       "answer": "I could not find this in Qatar's open statistics.",
       "correct": true,
-      "seconds": 4.44,
+      "seconds": 2.45,
       "cited": [],
       "extra_queries": []
     },
@@ -2136,7 +2592,7 @@
       "status": "not_found",
       "answer": "لم أجد إجابة لهذا السؤال في البيانات الإحصائية المفتوحة لدولة قطر.",
       "correct": true,
-      "seconds": 3.69,
+      "seconds": 1.67,
       "cited": [],
       "extra_queries": []
     },
@@ -2149,7 +2605,7 @@
       "status": "not_found",
       "answer": "I could not find this in Qatar's open statistics.",
       "correct": true,
-      "seconds": 2.37,
+      "seconds": 0.27,
       "cited": [],
       "extra_queries": []
     },
@@ -2162,7 +2618,7 @@
       "status": "not_found",
       "answer": "لم أجد إجابة لهذا السؤال في البيانات الإحصائية المفتوحة لدولة قطر.",
       "correct": true,
-      "seconds": 2.28,
+      "seconds": 0.25,
       "cited": [],
       "extra_queries": []
     },
@@ -2175,7 +2631,7 @@
       "status": "not_found",
       "answer": "I could not find this in Qatar's open statistics.",
       "correct": true,
-      "seconds": 3.97,
+      "seconds": 1.96,
       "cited": [],
       "extra_queries": []
     },
@@ -2188,7 +2644,7 @@
       "status": "not_found",
       "answer": "لم أجد إجابة لهذا السؤال في البيانات الإحصائية المفتوحة لدولة قطر.",
       "correct": true,
-      "seconds": 3.91,
+      "seconds": 1.94,
       "cited": [],
       "extra_queries": []
     }
@@ -2200,7 +2656,7 @@
     "chunks": 29699,
     "focus_rows": 0,
     "model": "ollama:qwen3:8b",
-    "date": "2026-10-07",
+    "date": "2026-10-08",
     "rerank": "rows"
   }
 }

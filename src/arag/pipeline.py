@@ -26,7 +26,7 @@ Rules:
 - Answer in the language of the question (Arabic or English), in 1 to 3 sentences.
 - Copy every number exactly as it appears in a source. Never calculate, round, estimate or convert numbers.
 - After each fact, cite the source number in square brackets, for example [2]. Every sentence with a number needs a citation.
-- Mention the year (and the unit, if the source gives one) of each figure.
+- Mention the year (and the unit, if the source gives one) of each figure. QR or QAR means Qatari riyals (in Arabic: ريال قطري); KG means kilograms (كيلوغرام).
 - If the sources do not contain the answer, reply with exactly: {NOT_FOUND}
 """
 
