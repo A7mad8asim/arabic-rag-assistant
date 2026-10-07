@@ -10,6 +10,7 @@ from arag.config import DEFAULT_MODELS, Settings
 from arag.index import Hit, Index, embedder_for
 from arag.llm import LLMError, make_llm
 from arag.pipeline import Answer, ask
+from arag.rerank import make_reranker
 from arag.text import is_arabic
 
 st.set_page_config(page_title="Arabic RAG Assistant", page_icon=":material/travel_explore:", layout="wide")
@@ -75,6 +76,11 @@ with st.sidebar:
     model = st.text_input("Model name", settings.llm_model if provider == settings.llm_provider else DEFAULT_MODELS[provider])
     retrieval = st.radio("Retrieval", ["bm25", "hybrid"], index=0 if settings.retrieval == "bm25" else 1, horizontal=True,
                          help="hybrid adds bge-m3 embeddings via Ollama (`ollama pull bge-m3`, then rebuild the index)")
+    rerank_options = ["rows", "llm", "none"]
+    rerank = st.radio("Rerank", rerank_options, horizontal=True,
+                      index=rerank_options.index(settings.rerank) if settings.rerank in rerank_options else 0,
+                      help="rows: rank chunks by their best single row (fast, default) · llm: the model picks the "
+                           "chunks that hold the answer (one extra call) · none: BM25 order")
     top_k = st.slider("Sources per question", 3, 10, settings.top_k)
     st.divider()
     st.caption("Try a question")
@@ -112,7 +118,7 @@ if question:
         try:
             with st.spinner("Searching 1,432 datasets ..."):
                 llm = make_llm(settings.with_(llm_provider=provider, llm_model=model))
-                ans = ask(question, index, llm, top_k)
+                ans = ask(question, index, llm, top_k, make_reranker(rerank, llm))
         except LLMError as e:
             st.error(str(e), icon=":material/error:")
             st.stop()

@@ -13,6 +13,7 @@ from dataclasses import dataclass, field
 
 from .index import Hit, Index
 from .llm import LLM
+from .rerank import Reranker, retrieve
 from .text import is_arabic, numbers_in
 
 NOT_FOUND = "NOT_FOUND"
@@ -80,9 +81,9 @@ def _message(kind: str, arabic: bool) -> str:
     return messages[kind][1 if arabic else 0]
 
 
-def ask(question: str, index: Index, llm: LLM, k: int = 6) -> Answer:
+def ask(question: str, index: Index, llm: LLM, k: int = 6, reranker: Reranker | None = None) -> Answer:
     start = time.perf_counter()
-    hits = index.search(question, k)
+    hits = retrieve(index, question, k, reranker)
     arabic = is_arabic(question)
     if not hits:
         return Answer(question, _message("not_found", arabic), "not_found", hits, seconds=time.perf_counter() - start)

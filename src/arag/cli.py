@@ -1,4 +1,4 @@
-"""Command line: arag fetch | index | ask | eval."""
+"""Command line: arag fetch | index | search | ask | eval."""
 
 from __future__ import annotations
 
@@ -11,6 +11,37 @@ from datetime import datetime
 from .config import DEFAULT_MODELS, EVAL_DIR, Settings
 from .index import Index, build_index, embedder_for
 from .llm import LLMError, make_llm
+from .rerank import make_reranker, retrieve
+
+RERANKERS = ["none", "rows", "llm"]
+
+
+def _save(result: dict, name: str | None = None) -> None:
+    out_dir = EVAL_DIR / "results"
+    out_dir.mkdir(parents=True, exist_ok=True)
+    text = json.dumps(result, ensure_ascii=False, indent=2)
+    (out_dir / f"{name or datetime.now().strftime('%Y%m%d-%H%M%S')}.json").write_text(text, encoding="utf-8")
+    (out_dir / "latest.json").write_text(text, encoding="utf-8")
+
+
+def _ablation_table(results: dict[str, dict], k: int) -> str:
+    """Markdown table: one row per configuration, test split first (held out), then dev."""
+    def cell(s, key):
+        v = s.get(key)
+        return "–" if v is None else (f"{v:.0f}%" if isinstance(v, float) and key != "mrr" else str(v))
+
+    lines = []
+    for split, label in (("test", "Held-out test split (80 questions)"), ("dev", "Dev split (40 questions, used for tuning)")):
+        lines += [f"**{label}**", "",
+                  f"| Reranker | Evidence@1 | Evidence@{k} | Dataset hit@1 | Answer accuracy (EN / AR) | Unanswerable refused | Wrong but shown | Withheld |",
+                  "| --- | --- | --- | --- | --- | --- | --- | --- |"]
+        for name, r in results.items():
+            s, en, ar = r["summary"][split], r["summary"][f"{split}_en"], r["summary"][f"{split}_ar"]
+            lines.append(f"| {name} | {cell(s, 'evidence@1')} | {cell(s, f'evidence@{k}')} | {cell(s, 'hit@1')} | "
+                         f"{cell(s, 'answer_accuracy')} ({cell(en, 'answer_accuracy')} / {cell(ar, 'answer_accuracy')}) | "
+                         f"{cell(s, 'unanswerable_refused')} | {s.get('wrong_but_shown', '–')} | {s.get('withheld', '–')} |")
+        lines.append("")
+    return "\n".join(lines)
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -18,6 +49,7 @@ def main(argv: list[str] | None = None) -> int:
         if hasattr(stream, "reconfigure"):
             stream.reconfigure(encoding="utf-8")  # Arabic output on Windows consoles
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
+    logging.getLogger("httpx").setLevel(logging.WARNING)
 
     p = argparse.ArgumentParser(prog="arag", description="Ask Qatar's open statistics, in Arabic or English.")
     sub = p.add_subparsers(dest="cmd", required=True)
@@ -27,17 +59,23 @@ def main(argv: list[str] | None = None) -> int:
     a = sub.add_parser("ask", help="ask a question")
     a.add_argument("question")
     a.add_argument("--provider", choices=["ollama", "anthropic"])
-    s = sub.add_parser("search", help="show the retrieved chunks only (no model)")
+    a.add_argument("--rerank", choices=RERANKERS)
+    s = sub.add_parser("search", help="show the retrieved chunks only (no answer)")
     s.add_argument("question")
+    s.add_argument("--rerank", choices=RERANKERS)
     e = sub.add_parser("eval", help="score retrieval (and answers) on the gold set")
     e.add_argument("--gold", default=str(EVAL_DIR / "gold.jsonl"))
-    e.add_argument("--retrieval-only", action="store_true", help="skip the model; score retrieval only")
+    e.add_argument("--retrieval-only", action="store_true", help="skip answering; score retrieval only")
     e.add_argument("--provider", choices=["ollama", "anthropic"])
+    e.add_argument("--rerank", choices=RERANKERS)
+    e.add_argument("--ablation", action="store_true", help="run every reranker and write eval/results/ablation.md")
     args = p.parse_args(argv)
 
     settings = Settings.from_env()
     if getattr(args, "provider", None) and args.provider != settings.llm_provider:
         settings = settings.with_(llm_provider=args.provider, llm_model=DEFAULT_MODELS[args.provider])
+    if getattr(args, "rerank", None):
+        settings = settings.with_(rerank=args.rerank)
 
     if args.cmd == "fetch":
         from .portal import fetch
@@ -50,15 +88,23 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     index = Index.load(settings.index_dir, embedder_for(settings))
+    needs_llm = args.cmd == "ask" or settings.rerank == "llm" or (args.cmd == "eval" and (args.ablation or not args.retrieval_only))
+    try:
+        llm = make_llm(settings) if needs_llm else None
+        reranker = make_reranker(settings.rerank, llm)
+    except (LLMError, ValueError) as err:
+        print(f"Error: {err}", file=sys.stderr)
+        return 1
+
     if args.cmd == "search":
-        for i, h in enumerate(index.search(args.question, settings.top_k), 1):
+        for i, h in enumerate(retrieve(index, args.question, settings.top_k, reranker), 1):
             print(f"[{i}] {h.score:.2f}  {h.chunk.id}\n    {h.chunk.text[:300]}\n")
         return 0
     if args.cmd == "ask":
         from .pipeline import ask
 
         try:
-            ans = ask(args.question, index, make_llm(settings), settings.top_k)
+            ans = ask(args.question, index, llm, settings.top_k, reranker)
         except LLMError as err:
             print(f"Error: {err}", file=sys.stderr)
             return 1
@@ -72,14 +118,26 @@ def main(argv: list[str] | None = None) -> int:
     if args.cmd == "eval":
         from .evaluation import evaluate, load_gold
 
-        llm = None if args.retrieval_only else make_llm(settings)
-        result = evaluate(load_gold(args.gold), index, llm, settings.top_k)
-        result["settings"] = {"retrieval": settings.retrieval, "top_k": settings.top_k,
-                              "model": None if llm is None else llm.name, "chunks": len(index.chunks)}
-        out = EVAL_DIR / "results" / f"{datetime.now():%Y%m%d-%H%M%S}.json"
-        out.parent.mkdir(parents=True, exist_ok=True)
-        out.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
-        (EVAL_DIR / "results" / "latest.json").write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
+        gold = load_gold(args.gold)
+        meta = {"retrieval": settings.retrieval, "top_k": settings.top_k, "chunks": len(index.chunks),
+                "model": None if llm is None else llm.name, "date": datetime.now().strftime("%Y-%m-%d")}
+        if args.ablation:
+            results = {}
+            for name in RERANKERS:
+                logging.info("ablation: reranker=%s", name)
+                result = evaluate(gold, index, llm, settings.top_k, make_reranker(name, llm))
+                result["settings"] = dict(meta, rerank=name)
+                _save(result, f"ablation_{name}")
+                results[name] = result
+            table = _ablation_table(results, settings.top_k)
+            (EVAL_DIR / "results" / "ablation.md").write_text(
+                f"# Reranker ablation ({meta['date']}, {meta['model']}, {meta['retrieval']} retrieval, top {settings.top_k})\n\n{table}",
+                encoding="utf-8")
+            print(table)
+            return 0
+        result = evaluate(gold, index, None if args.retrieval_only else llm, settings.top_k, reranker)
+        result["settings"] = dict(meta, rerank=settings.rerank)
+        _save(result)
         print(json.dumps(result["summary"], ensure_ascii=False, indent=2))
         return 0
     return 1

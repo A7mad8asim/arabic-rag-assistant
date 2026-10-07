@@ -14,3 +14,5 @@ data/
 eval/results/*
 !eval/results/latest.json
 !eval/results/baseline.json
+!eval/results/ablation.md
+!eval/results/ablation_*.json

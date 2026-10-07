@@ -31,6 +31,7 @@ class Settings:
     retrieval: str  # bm25 | hybrid
     embedding_model: str
     top_k: int
+    rerank: str  # none | rows (default) | llm
     portal_url: str
     publisher: str
     max_rows_per_dataset: int
@@ -58,6 +59,7 @@ class Settings:
             retrieval=_env("RETRIEVAL", "bm25").lower(),
             embedding_model=_env("EMBEDDING_MODEL", "bge-m3"),
             top_k=int(_env("TOP_K", "6")),
+            rerank=_env("RERANK", "rows").lower(),
             portal_url=_env("PORTAL_URL", "https://www.data.gov.qa").rstrip("/"),
             publisher=_env("PUBLISHER", "National Planning Council"),
             max_rows_per_dataset=int(_env("MAX_ROWS_PER_DATASET", "5000")),
