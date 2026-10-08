@@ -103,23 +103,24 @@ def summarize(rows: list[dict], k: int, with_answers: bool) -> dict:
             s["lookup_accuracy"] = _pct([r["correct"] for r in lookups])
             s["unanswerable_refused"] = _pct([r["correct"] for r in rs if r["kind"] == "unanswerable"])
             s["wrong_but_shown"] = sum(1 for r in lookups if r["status"] == "answered" and not r["correct"])
-            s["withheld"] = sum(1 for r in rs if r["status"] == "ungrounded")
+            s["withheld"] = sum(1 for r in rs if r["status"] in ("ungrounded", "unverified"))
+            s["unverified"] = sum(1 for r in rs if r["status"] == "unverified")
         summary[name] = s
     return summary
 
 
 def evaluate(gold: list[dict], index: Index, llm: LLM | None = None, k: int = 6, reranker: Reranker | None = None,
-             focus: int = 0, expand=None) -> dict:
+             focus: int = 0, expand=None, verify: bool = False) -> dict:
     rows = []
     for item in gold:
         row = {"id": item["id"], "lang": item["lang"], "kind": item["kind"],
                "split": item.get("split", "dev"), "dialect": item.get("dialect", False)}
         if llm is not None:
-            ans = ask(item["question"], index, llm, k, reranker, focus, expand)
+            ans = ask(item["question"], index, llm, k, reranker, focus, expand, verify)
             hits = ans.hits  # the chunks the model saw: retrieve (and an LLM rerank) only once
             context = ans.context or build_context(item["question"], hits, focus)
             row.update(status=ans.status, answer=ans.text, correct=answer_correct(item, ans), seconds=round(ans.seconds, 2),
-                       cited=[h.chunk.dataset_id for h in ans.sources], extra_queries=ans.extra_queries)
+                       cited=[h.chunk.dataset_id for h in ans.sources], extra_queries=ans.extra_queries, raw=ans.raw)
         else:
             extra = expand(item["question"]) if expand else []
             hits = retrieve(index, item["question"], k, reranker, extra=extra)

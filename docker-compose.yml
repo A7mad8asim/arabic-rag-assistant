@@ -51,6 +51,7 @@ services:
       - RERANK=${RERANK:-llm}
       - FOCUS_ROWS=${FOCUS_ROWS:-3}
       - TRANSLATE_QUERY=${TRANSLATE_QUERY:-1}
+      - VERIFY_ROW=${VERIFY_ROW:-1}
 
 volumes:
   ollama:

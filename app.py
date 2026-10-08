@@ -63,9 +63,13 @@ def render(ans: Answer) -> None:
             source_card(n, ans.hits[n - 1], shown[n - 1])
     elif ans.status == "not_found":
         st.info(ans.text, icon=":material/search_off:")
-    else:  # ungrounded
+    else:  # ungrounded, or unverified by the row check
         st.warning(ans.text, icon=":material/gpp_maybe:")
-        st.caption("Numbers the sources did not contain: " + ", ".join(ans.ungrounded_numbers))
+        if ans.status == "unverified":
+            st.caption("The row behind the model's figure did not match every condition of the question, "
+                       "so the figure is not shown.")
+        else:
+            st.caption("Numbers the sources did not contain: " + ", ".join(ans.ungrounded_numbers))
         for n, hit in enumerate(ans.hits[:3], 1):
             source_card(n, hit, shown[n - 1])
     if ans.extra_queries:
@@ -94,6 +98,9 @@ with st.sidebar:
     top_k = st.slider("Sources per question", 3, 10, settings.top_k)
     translate = st.toggle("Query translation", settings.translate_query,
                           help="Also search with the question translated into the other language (one extra model call)")
+    verify = st.toggle("Row check", settings.verify_row,
+                       help="Ask the model whether the row behind the answer matches every condition of the question; "
+                            "if not, show the sources instead of the figure (one extra model call)")
     focus = st.slider("Rows shown per source", 0, 20, settings.focus_rows,
                       help="Show the model only the rows of each table that best match the question. 0 = all rows.")
     st.divider()
@@ -133,7 +140,7 @@ if question:
             with st.spinner("Searching 1,432 datasets ..."):
                 llm = make_llm(settings.with_(llm_provider=provider, llm_model=model))
                 ans = ask(question, index, llm, top_k, make_reranker(rerank, llm), focus,
-                          QueryTranslator(llm) if translate else None)
+                          QueryTranslator(llm) if translate else None, verify)
         except LLMError as e:
             st.error(str(e), icon=":material/error:")
             st.stop()

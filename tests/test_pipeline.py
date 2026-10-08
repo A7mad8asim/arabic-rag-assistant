@@ -92,3 +92,49 @@ def test_reply_that_only_repeats_the_questions_numbers_is_not_an_answer(index):
     assert declined("المنتخب القطري فاز بنهائي كأس العالم 2022.", "من فاز بنهائي كأس العالم 2022؟")
     ans = ask("من فاز بنهائي كأس العالم 2022؟", index, FakeLLM("المنتخب القطري فاز بنهائي كأس العالم 2022."))
     assert ans.status == "not_found"
+
+
+class ScriptedLLM:
+    """Answers the main question with `answer` and the row check with `verdict`."""
+
+    name = "scripted"
+
+    def __init__(self, answer, verdict):
+        self.answer, self.verdict, self.checks = answer, verdict, []
+
+    def complete(self, system, user):
+        if system.startswith("You check whether one row"):
+            self.checks.append(user)
+            return self.verdict
+        return self.answer
+
+
+def _source_with(index, question, number):
+    from arag.rerank import retrieve
+
+    return next(i for i, h in enumerate(retrieve(index, question, 6), 1) if f"Number: {number}" in h.chunk.text)
+
+
+def test_row_check_withholds_an_answer_whose_row_does_not_match(index):
+    q = "How many gyms were there in Doha in 2023?"
+    n = _source_with(index, q, 104)
+    llm = ScriptedLLM(f"Doha had 104 gyms in 2023 [{n}].", "no")
+    ans = ask(q, index, llm, verify=True)
+    assert ans.status == "unverified" and "104" not in ans.text and "could not confirm" in ans.text
+    assert "Number: 104" in llm.checks[0] and "Question: " + q in llm.checks[0]
+
+
+def test_row_check_keeps_a_confirmed_answer_and_is_off_by_default(index):
+    q = "How many gyms were there in Doha in 2023?"
+    n = _source_with(index, q, 104)
+    assert ask(q, index, ScriptedLLM(f"Doha had 104 gyms in 2023 [{n}].", "Yes.")).status == "answered"
+    llm = ScriptedLLM(f"Doha had 104 gyms in 2023 [{n}].", "no")
+    assert ask(q, index, llm).status == "answered" and llm.checks == []  # verify defaults to off
+
+
+def test_answer_rows_finds_the_row_behind_the_figure():
+    from arag.pipeline import answer_rows
+
+    context = ["Gyms\nYear: 2023 · Municipality: Doha · Number: 104\nYear: 2023 · Municipality: Al Rayyan · Number: 41"]
+    assert answer_rows("Doha had 104 gyms in 2023 [1].", "Doha in 2023?", context, [1]) == [
+        ("Gyms", "Year: 2023 · Municipality: Doha · Number: 104")]

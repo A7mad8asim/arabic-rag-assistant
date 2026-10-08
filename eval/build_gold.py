@@ -221,6 +221,67 @@ LARGE = [
      "كم عدد وفيات الذكور القطريين بعمر 72 سنة المسجلة في 2020؟", False),
 ]
 
+# The "test2" split: a fresh held-out set written on 8 Oct 2026 after the row-matching fixes were designed
+# (from failures in the test split) and before they were evaluated. Datasets and rows were sampled at random
+# (seed 2026) from tables not used anywhere else in the gold set.
+HELD2 = [
+    ("H01", "economically-active-qatari-females-15-years-and-above-by-educational-status-and-occupation",
+     ["Year: 2020", "Technicians and Associate", "University and above"], "2,501",
+     "How many economically active Qatari women with a university degree or higher worked as technicians and associate professionals in 2020?",
+     "كم عدد القطريات النشيطات اقتصادياً من حملة الشهادة الجامعية فما فوق اللاتي عملن فنيات واختصاصيات مساعدات في 2020؟", False),
+    ("H02", "number-of-employees-and-estimates-of-compensation-of-employees-by-nationality-and-main-economic-activity-activity-codes-53-5229-isic-rev4-10-or-more-employees",
+     ["Year: 2021", "Other passenger land transport (without time schedule)", "Nationality: Qataris"], "18",
+     "How many Qataris worked in other passenger land transport (without a time schedule) in establishments with 10 or more employees in 2021?",
+     "كم عدد القطريين العاملين في النقل البري للركاب غير المحدد بمواعيد في المنشآت التي يعمل بها 10 موظفين أو أكثر عام 2021؟", False),
+    ("H03", "sdg-11-7-2-number-of-victims-of-physical-or-sexual-harassment-by-type-of-person-and-gender",
+     ["Year: 2016", "Without disability", "Gender: Males"], "673",
+     "How many male victims of physical or sexual harassment without a disability were recorded in 2016?",
+     "كم رجل سليم بدون إعاقة تعرض لتحرش جسدي أو جنسي سنة 2016؟", True),
+    ("H04", "sdg-13-1-1-number-of-injured-persons-and-deaths-attributed-to-disasters-per-100-000-population-by",
+     ["Year: 2021", "Coronavirus", "Impact Type: Deaths", "15-64"], "9.9",
+     "What was the coronavirus death rate per 100,000 people aged 15-64 in 2021?",
+     "كم كان معدل وفيات وباء كورونا لكل 100 ألف نسمة للفئة العمرية 15-64 سنة في 2021؟", False),
+    ("H05", "trainees-at-the-private-training-centers-according-to-the-educational-status-gender-nationality-and",
+     ["Year: 2022", "Field of Training: Languages", "Non Qataris", "Educational Status: University", "Gender: Females"], "338",
+     "How many non-Qatari women with a university education trained in languages at private training centres in 2022?",
+     "كم عدد غير القطريات الجامعيات اللاتي تدربن في مجال اللغات في المراكز التدريبية الخاصة عام 2022؟", False),
+    ("H06", "economically-active-population-15-years-and-above-by-educational-status-and-occupation",
+     ["Year: 2020", "Service Workers and Shop", "Educational Status: Read & Write"], "4,551",
+     "How many economically active people who can read and write worked as service workers or shop and market sales workers in 2020?",
+     "كم عدد النشيطين اقتصادياً ممن يقرأون ويكتبون والعاملين في الخدمات والباعة في المحلات التجارية والأسواق عام 2020؟", False),
+    ("H07", "estimates-of-value-of-intermediate-services-by-main-economic-activity-wholesale-and-retail-trade",
+     ["Year: 2021", "Activity Code: 46 ·", "Transportation"], "56,141",
+     "What was the value of transportation services used by wholesale trade (excluding motor vehicles) in 2021?",
+     "كم كانت قيمة خدمات النقل والانتقالات في تجارة الجملة باستثناء المركبات عام 2021؟", False),
+    ("H08", "services-provided-to-cases-received-by-the-protection-and-social-rehabilitation-center-by",
+     ["Year: 2014", "External Unit Service", "Nationality: Non-Qatari", "Age Group: Adult", "Gender: Females"], "28",
+     "How many external unit services did the Protection and Social Rehabilitation Center provide to adult non-Qatari women in 2014?",
+     "كم خدمة وحدة خارجية قدمها مركز الحماية والتأهيل الاجتماعي لحريم بالغات غير قطريات سنة 2014؟", True),
+    ("H09", "staff-providing-services-for-disabled-at-rumeilah-hospital-by-occupation-and-gender",
+     ["Year: 2019", "Prosthetics Technician", "Gender: Males"], "10",
+     "How many male prosthetics technicians served people with disabilities at Rumeilah Hospital in 2019?",
+     "كم عدد فنيي الأطراف الصناعية الذكور في مستشفى الرميلة عام 2019؟", False),
+    ("H10", "sdg-16-7-1-number-of-positions-of-judges-and-court-clerks-by-court-level-and-disability-status",
+     ["Year: 2022", "Primary Courts", "Court clerks", "Without disability"], "136",
+     "How many court clerk positions held by people without a disability were there in the primary courts in 2022?",
+     "كم عدد وظائف رؤساء الأقلام من غير ذوي الإعاقة في المحاكم الابتدائية عام 2022؟", False),
+    ("H11", "quantities-of-pesticides-for-the-control-of-palm-pests-by-type",
+     ["Year: 2012", "Betalarve"], "142",
+     "How many litres of Betalarve 2.5% were used against palm pests in 2012?",
+     "كم لتراً من مبيد بيتالارف 2.5% استخدم لمكافحة آفات النخيل في 2012؟", False),
+    ("H12", "sdg-11-7-2-number-of-victims-of-physical-or-sexual-harassment-by-age-group-and-gender",
+     ["Year: 2020", "Under 15", "Gender: Males"], "21",
+     "How many boys under 15 were victims of physical or sexual harassment in 2020?",
+     "كم ولد تحت 15 سنة تعرض لتحرش جسدي أو جنسي سنة 2020؟", True),
+]
+
+# test2 alternatives: identical rows in sibling tables (found when answers had the right value but cited the
+# sibling; each is verified by the script like any other alternative).
+ALSO_ACCEPT_HELD2 = {
+    "H04": ["sdg-1-5-1-number-of-injured-persons-and-deaths-attributed-to-disasters-per-100-000-population-by-age"],
+    "H09": ["special-needs-statistics-number-of-staff-providing-services-for-disabled-at-rumailah-hospital-and"],
+}
+
 UNANSWERABLE = [
     ("U06", "How many hotel nights did Qatari guests spend in 2040?", "كم عدد ليالي الإقامة للنزلاء القطريين في الفنادق عام 2040؟"),
     ("U07", "What is the population of Tokyo?", "كم عدد سكان طوكيو؟"),
@@ -293,6 +354,7 @@ def main() -> int:
 
     add_lookups(LOOKUPS, "test", ALSO_ACCEPT, scan_large=False)
     add_lookups(LARGE, "large", {}, scan_large=True)
+    add_lookups(HELD2, "test2", ALSO_ACCEPT_HELD2, scan_large=False)
     for uid, en, ar in UNANSWERABLE:
         for lang, q in (("en", en), ("ar", ar)):
             out.append({"id": uid, "lang": lang, "kind": "unanswerable", "question": q, "dataset_ids": [],
@@ -307,8 +369,8 @@ def main() -> int:
     with open(gold_path, "w", encoding="utf-8") as f:
         for r in kept + out:
             f.write(json.dumps(r, ensure_ascii=False) + "\n")
-    counts = {s: sum(r["split"] == s for r in out) for s in ("test", "large")}
-    print(f"{len(kept)} dev + {counts['test']} test + {counts['large']} large questions -> {gold_path}")
+    counts = {s: sum(r["split"] == s for r in out) for s in ("test", "large", "test2")}
+    print(f"{len(kept)} dev + {counts['test']} test + {counts['large']} large + {counts['test2']} test2 questions -> {gold_path}")
     return 1 if problems else 0
 
 

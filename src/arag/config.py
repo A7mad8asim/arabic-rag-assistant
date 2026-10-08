@@ -34,6 +34,7 @@ class Settings:
     rerank: str  # none | rows (default) | llm
     focus_rows: int  # show the model only this many best-matching rows per table chunk; 0 = whole chunks
     translate_query: bool  # also search with the question translated into the other language
+    verify_row: bool  # ask the model whether the answer's row matches every condition; withhold if not
     portal_url: str
     publisher: str
     max_rows_per_dataset: int
@@ -64,6 +65,7 @@ class Settings:
             rerank=_env("RERANK", "rows").lower(),
             focus_rows=int(_env("FOCUS_ROWS", "0")),
             translate_query=_env("TRANSLATE_QUERY", "0").lower() in ("1", "true", "yes"),
+            verify_row=_env("VERIFY_ROW", "0").lower() in ("1", "true", "yes"),
             portal_url=_env("PORTAL_URL", "https://www.data.gov.qa").rstrip("/"),
             publisher=_env("PUBLISHER", "National Planning Council"),
             max_rows_per_dataset=int(_env("MAX_ROWS_PER_DATASET", "30000")),

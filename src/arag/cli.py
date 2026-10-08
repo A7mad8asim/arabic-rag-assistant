@@ -79,6 +79,8 @@ def _add_pipeline_options(parser: argparse.ArgumentParser) -> None:
     parser.add_argument("--retrieval", choices=["bm25", "hybrid"], help="hybrid needs `arag embed` first")
     parser.add_argument("--translate", action=argparse.BooleanOptionalAction, default=None,
                         help="also search with the question translated into the other language")
+    parser.add_argument("--verify", action=argparse.BooleanOptionalAction, default=None,
+                        help="check that the answer's row matches every condition of the question; withhold if not")
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -106,7 +108,7 @@ def main(argv: list[str] | None = None) -> int:
     e.add_argument("--retrieval-only", action="store_true", help="skip answering; score retrieval only")
     e.add_argument("--provider", choices=["ollama", "anthropic"])
     _add_pipeline_options(e)
-    e.add_argument("--split", choices=["dev", "test", "large"], help="only this split of the gold set")
+    e.add_argument("--split", choices=["dev", "test", "large", "test2"], help="only this split of the gold set")
     e.add_argument("--ablation", action="store_true",
                    help="run the rerankers in --rerankers at the current settings and rebuild eval/results/ablation.md "
                         "from all saved runs")
@@ -124,6 +126,8 @@ def main(argv: list[str] | None = None) -> int:
         settings = settings.with_(retrieval=args.retrieval)
     if getattr(args, "translate", None) is not None:
         settings = settings.with_(translate_query=args.translate)
+    if getattr(args, "verify", None) is not None:
+        settings = settings.with_(verify_row=args.verify)
 
     if args.cmd == "fetch":
         from .portal import fetch
@@ -163,7 +167,7 @@ def main(argv: list[str] | None = None) -> int:
         from .pipeline import ask
 
         try:
-            ans = ask(args.question, index, llm, settings.top_k, reranker, settings.focus_rows, expand)
+            ans = ask(args.question, index, llm, settings.top_k, reranker, settings.focus_rows, expand, settings.verify_row)
         except LLMError as err:
             print(f"Error: {err}", file=sys.stderr)
             return 1
@@ -178,13 +182,15 @@ def main(argv: list[str] | None = None) -> int:
         from .evaluation import evaluate, load_gold
 
         gold = [g for g in load_gold(args.gold) if not args.split or g.get("split", "dev") == args.split]
-        meta = {"retrieval": settings.retrieval, "translate_query": settings.translate_query, "top_k": settings.top_k,
+        meta = {"retrieval": settings.retrieval, "translate_query": settings.translate_query, "verify_row": settings.verify_row,
+                "top_k": settings.top_k,
                 "chunks": len(index.chunks), "focus_rows": settings.focus_rows,
                 "model": None if llm is None else llm.name, "date": datetime.now().strftime("%Y-%m-%d")}
         if args.ablation:
             for name in [r.strip() for r in args.rerankers.split(",") if r.strip()]:
                 logging.info("ablation: %s", _label(dict(meta, rerank=name)))
-                result = evaluate(gold, index, llm, settings.top_k, make_reranker(name, llm), settings.focus_rows, expand)
+                result = evaluate(gold, index, llm, settings.top_k, make_reranker(name, llm), settings.focus_rows, expand,
+                                  settings.verify_row)
                 result["settings"] = dict(meta, rerank=name)
                 _save(result, f"ablation_{name}{_suffix(settings)}")
             saved = [json.loads(f.read_text(encoding="utf-8")) for f in sorted((EVAL_DIR / "results").glob("ablation_*.json"))]
@@ -194,7 +200,7 @@ def main(argv: list[str] | None = None) -> int:
             print(table)
             return 0
         result = evaluate(gold, index, None if args.retrieval_only else llm, settings.top_k, reranker,
-                          settings.focus_rows, expand)
+                          settings.focus_rows, expand, settings.verify_row)
         result["settings"] = dict(meta, rerank=settings.rerank)
         _save(result)
         print(json.dumps(result["summary"], ensure_ascii=False, indent=2))
