@@ -128,6 +128,54 @@ def row_matches(llm: LLM, question: str, header: str, row: str) -> bool:
     return (reply or "").strip().strip("\"'.").lower().startswith(("yes", "نعم"))
 
 
+def retry_answer(llm: LLM, question: str, context: list[str], answer: str, reason: str) -> str:
+    """Ask again, telling the model which sub-group its first row was limited to."""
+    note = (f"Your previous answer was: {answer}\nIt used a row that is limited to {reason}. "
+            "Answer again using a row that is not limited that way: the total row, or a table without that breakdown. "
+            f"If no source has such a row, reply with exactly: {NOT_FOUND}")
+    return llm.complete(SYSTEM, build_prompt(question, context) + "\n\n" + note).strip()
+
+
+# ------------------------------------------------------------------ sub-group check (deterministic)
+# A row can match everything the question says and still be the wrong one: a Qatari-only row for a question
+# that names no nationality, or a table for establishments with 10 or more employees when all were asked.
+# The model does not notice this, even when asked to check (measured), so it is detected here, narrowly: only
+# nationality, gender and establishment size, the classic sub-group breakdowns of these tables.
+
+def _fields(row: str) -> list[tuple[str, str]]:
+    """A rendered row's "Label: value" fields (rows are written as "Label: value · Label: value ...")."""
+    out = []
+    for part in row.split(" · "):
+        label, sep, value = part.partition(":")
+        if sep and 1 < len(label.strip()) <= 60:
+            out.append((label.strip(), value.strip()))
+    return out
+_TOTAL = re.compile(r"\b(total|all|both)\b|إجمالي|اجمالي|المجموع|الكل|جملة", re.IGNORECASE)
+_DIMENSIONS = {
+    "nationality": (re.compile(r"nationalit|جنسي", re.IGNORECASE),
+                    re.compile(r"qatari|non-?qatari|citizen|national|expat|migrant|foreign|قطري|مواطن|وافد|أجنب|اجنب|جنسي", re.IGNORECASE)),
+    "gender": (re.compile(r"^\s*(gender|sex)\b|الجنس|النوع", re.IGNORECASE),
+               re.compile(r"\b(male|female|men|women|man|woman|boys?|girls?|gender|sex)\b|ذكر|ذكور|إناث|اناث|أنثى|انثى|رجال|نساء|"
+                          r"بنات|بنت|فتيات|أولاد|اولاد|ولد|شباب|شاب|حريم|الجنس", re.IGNORECASE)),
+}
+_SIZE_TITLE = re.compile(r"\(?\s*(less than 10|10 or more|10 employees and more|10 employees & more)[^)|]*\)?", re.IGNORECASE)
+_SIZE_ASKED = re.compile(r"employees|establishments? (with|of)|size|عمال|موظف|مشتغل|حجم", re.IGNORECASE)
+
+
+def subgroup_issue(question: str, header: str, row: str) -> str | None:
+    """The sub-group the row (or its table) is limited to, if the question does not ask for one; else None."""
+    for name, (label_re, asked_re) in _DIMENSIONS.items():
+        if asked_re.search(question):
+            continue
+        for label, value in _fields(row):
+            if label_re.search(label) and value and not _TOTAL.search(value):
+                return f"{label}: {value} (the question names no {name})"
+    size = _SIZE_TITLE.search(header)
+    if size and not _SIZE_ASKED.search(question):
+        return f"establishments of one size ({size.group(1)}; the question asks about all establishments)"
+    return None
+
+
 def _message(kind: str, arabic: bool) -> str:
     messages = {
         "not_found": ("I could not find this in Qatar's open statistics.",
@@ -145,7 +193,9 @@ def ask(question: str, index: Index, llm: LLM, k: int = 6, reranker: Reranker | 
     """`focus` > 0 shows the model only that many best-matching rows of each table chunk (0 = whole chunks).
     `expand` (a QueryTranslator) adds the question in the other language to the search.
     `verify` asks the model, in a second short call, whether the row behind the answer matches every condition of
-    the question; if it does not, the answer is withheld ("unverified") and the sources are shown instead."""
+    the question; if it does not, the answer is withheld ("unverified") and the sources are shown instead. It also
+    catches rows limited to a sub-group the question does not ask for (nationality, gender, establishment size):
+    the model gets one retry, told which sub-group to avoid, and the figure is withheld if that fails too."""
     start = time.perf_counter()
     extra = expand(question) if expand else []
     hits = retrieve(index, question, k, reranker, extra=extra)
@@ -163,7 +213,24 @@ def ask(question: str, index: Index, llm: LLM, k: int = 6, reranker: Reranker | 
     cited, missing = check_grounding(raw, question, context)
     status, text = ("ungrounded", _message("ungrounded", arabic)) if missing else ("answered", raw)
     if status == "answered" and verify:
+        asked = " ".join([question, *extra])  # the translation can name the group the dialect question names
         rows = answer_rows(raw, question, context, cited)[:2]
         if rows and not any(row_matches(llm, question, header, row) for header, row in rows):
             status, text = "unverified", _message("unverified", arabic)
+        elif rows and (issue := first_subgroup_issue(asked, rows)):
+            retry = retry_answer(llm, question, context, raw, issue)
+            r_cited, r_missing = check_grounding(retry, question, context)
+            r_rows = answer_rows(retry, question, context, r_cited)[:2]
+            if (declined(retry, question) or r_missing or not r_rows or first_subgroup_issue(asked, r_rows)
+                    or not any(row_matches(llm, question, header, row) for header, row in r_rows)):
+                status, text = "unverified", _message("unverified", arabic)
+            else:
+                raw, cited, text = retry, r_cited, retry
     return Answer(question, text, status, hits, cited, missing, raw, time.perf_counter() - start, context, extra)
+
+
+def first_subgroup_issue(question: str, rows: list[tuple[str, str]]) -> str | None:
+    for header, row in rows:
+        if issue := subgroup_issue(question, header, row):
+            return issue
+    return None

@@ -138,3 +138,67 @@ def test_answer_rows_finds_the_row_behind_the_figure():
     context = ["Gyms\nYear: 2023 · Municipality: Doha · Number: 104\nYear: 2023 · Municipality: Al Rayyan · Number: 41"]
     assert answer_rows("Doha had 104 gyms in 2023 [1].", "Doha in 2023?", context, [1]) == [
         ("Gyms", "Year: 2023 · Municipality: Doha · Number: 104")]
+
+
+def test_subgroup_issue_flags_unasked_nationality_gender_and_size():
+    from arag.pipeline import subgroup_issue
+
+    girls = "How many girls under 15 with intellectual disabilities received services in 2020?"
+    qatari_row = "Year: 2020 · Nationality: Qatari / قطري · Gender: Female / إناث · Number: 86"
+    total_row = "Year: 2020 · Gender: Female / إناث · Number: 160"
+    assert "Nationality: Qatari" in subgroup_issue(girls, "Disabilities", qatari_row)
+    assert subgroup_issue(girls, "Disabilities", total_row) is None  # gender is asked ("girls"), so not an issue
+    assert subgroup_issue("How many Qatari girls ... in 2020?", "Disabilities", qatari_row) is None
+    assert "Gender: Male" in subgroup_issue("How many deaths in 2020?", "Deaths", "Year: 2020 · Gender: Male · Value: 9")
+    assert subgroup_issue("How many deaths in 2020?", "Deaths", "Year: 2020 · Nationality: Total · Value: 9") is None
+    size = "Main Economic Indicators - Energy and Industry (10 Employees and more) | أهم"
+    assert "one size" in subgroup_issue("Productivity in textiles in 2017?", size, "Year: 2017 · Value: 113,829")
+    assert subgroup_issue("Productivity in textiles in 2017 in establishments with 10 or more employees?", size,
+                          "Year: 2017 · Value: 113,829") is None
+    assert subgroup_issue("كم ولد تحت 15 سنة في 2020؟", "Victims", "Year: 2020 · Gender: Males / ذكور · Number: 21") is None
+
+
+class SubgroupLLM:
+    """First answer cites the Qatari-only row; after the retry note it cites the total row. Row check says yes."""
+
+    name = "subgroup"
+
+    def __init__(self):
+        self.prompts = []
+
+    def complete(self, system, user):
+        if system.startswith("You check whether one row"):
+            return "yes"
+        self.prompts.append(user)
+        return "160 girls in 2020 [1]." if "is limited to" in user else "86 girls in 2020 [1]."
+
+
+class OneChunkIndex:
+    def __init__(self, text):
+        from arag.chunking import Chunk
+        from arag.index import Hit
+
+        self.hits = [Hit(Chunk("d#rows1", "d", "rows", "Disabilities", "", text, "u"), 1.0)]
+
+    def search(self, query, k=6, pool=50):
+        return self.hits[:k]
+
+
+def test_subgroup_answer_is_retried_with_the_reason_and_the_total_is_shown():
+    index = OneChunkIndex("Disabilities\nYear: 2020 · Nationality: Qatari · Gender: Female · Number: 86\n"
+                          "Year: 2020 · Gender: Female · Number: 160")
+    llm = SubgroupLLM()
+    ans = ask("How many girls with disabilities received services in 2020?", index, llm, verify=True)
+    assert ans.status == "answered" and "160" in ans.text
+    assert "limited to Nationality: Qatari" in llm.prompts[1]
+
+
+def test_subgroup_answer_is_withheld_when_the_retry_cannot_avoid_it():
+    index = OneChunkIndex("Disabilities\nYear: 2020 · Nationality: Qatari · Gender: Female · Number: 86")
+
+    class Stubborn(SubgroupLLM):
+        def complete(self, system, user):
+            return "yes" if system.startswith("You check whether one row") else "86 girls in 2020 [1]."
+
+    ans = ask("How many girls with disabilities received services in 2020?", index, Stubborn(), verify=True)
+    assert ans.status == "unverified" and "86" not in ans.text

@@ -8,7 +8,7 @@ The corpus is the **1,432 datasets the National Planning Council publishes on th
 
 The design rule: **the model may only repeat a number that appears in a source it cites.** If an answer contains any other number, it is not shown, and the reader gets the sources instead. If the sources don't contain the answer, the system says so.
 
-**Result, on a local 8B model at about 2 seconds per question: 81–83% of questions on two held-out sets answered correctly, every unanswerable question refused, and about 1 lookup in 20 answered wrongly. A final row check holds back answers whose source row does not match the question** ([details](#results)).
+**Result, on a local 8B model at about 2 seconds per question: 81–83% of questions on two held-out sets answered correctly, every unanswerable question refused, and about 1 lookup in 25 answered wrongly. Two final checks hold back, or correct, answers whose source row does not match the question** ([details](#results)).
 
 ![The app answering an English question with its source card open, and a Gulf-dialect Arabic question below it](docs/screenshot.png)
 
@@ -45,6 +45,7 @@ flowchart LR
 | Answer | A local **Qwen3-8B via Ollama** answers from the numbered sources only, in the question's language, citing `[n]`. Claude via the API is an optional comparison | `llm.py`, `pipeline.py` |
 | Check | A reply without a new figure, or that declines in words ("the data does not include…", "لا يوجد…"), is reported as **not found**. A figure that is not in its cited source (as the model saw it) is **withheld**, and the sources are shown instead | `pipeline.py` |
 | Row check | One more short model call: the row behind the figure, its table title and the question, and "does this row match every condition of the question?" If not, the figure is withheld ("unverified") and the sources are shown | `pipeline.py` |
+| Sub-group check | Code, not the model: if the row is limited to a nationality, a gender or an establishment size that the question does not ask for (a Qatari-only row when no nationality was asked), the model answers once more, told which sub-group to avoid; if the new answer is still limited, the figure is withheld | `pipeline.py` |
 
 ## Quick start
 
@@ -110,15 +111,15 @@ python eval/build_gold.py                   # rebuild the test and large questio
 
 ### Results
 
-Measured on 8 October 2026: Qwen3-8B (4-bit) via Ollama on an RTX 5060 Ti 16 GB, index of 29,699 chunks from all 1,432 datasets. Raw results: [`final_recommended.json`](eval/results/final_recommended.json), [`final_default.json`](eval/results/final_default.json).
+Measured on 11 October 2026: Qwen3-8B (4-bit) via Ollama on an RTX 5060 Ti 16 GB, index of 29,699 chunks from all 1,432 datasets. Raw results: [`final_recommended.json`](eval/results/final_recommended.json), [`final_default.json`](eval/results/final_default.json).
 
 | Setup | Held-out test (80) | Test2, fresh held-out (24) | Dev (40) | All 120 | Large tables (24) | Unanswerable refused | Gulf dialect | Wrong but shown (of 120) | Time per question |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| **Recommended**: hybrid + translation + LLM rerank + 3 rows + row check | 81% (EN 75 / AR 87.5) | **83%** | **87.5%** | **83%** | **79%** | **100%** | **16 / 19** | 7 | 2.3 s |
+| **Recommended**: hybrid + translation + LLM rerank + 3 rows + row and sub-group checks | 81% (EN 77.5 / AR 85) | **83%** | **87.5%** | **83%** | **79%** | **100%** | **16 / 19** | **6** | 2.7 s |
 | Zero-download: BM25 + row rerank | 81% | – | 77.5% | 80% | 50% | **100%** | 12 / 16 | 10 | 1.9 s |
 
 - **Where the recommended setup pays off:** on the general held-out questions the two setups are close. It earns its place on the large trade tables (79–88% vs 50%: the zero-download setup cannot match Arabic questions to the English-only trade columns), on Gulf dialect, and on the dev split.
-- **Wrong answers are rare and get rarer:** across all 168 questions, 8 of the 148 lookups were answered with a wrong figure; without the row check that run would have shown 16 (see below).
+- **Wrong answers are rare:** across all 168 questions, 6 of the 148 lookups were answered with a wrong figure (none in the large or test2 splits). On the same answers, without the two checks, 16 would have been shown (see below).
 - **Run-to-run variation is real:** the model runs at temperature 0, but GPU arithmetic is not perfectly deterministic, and a translation or reranking that differs slightly changes which rows the model sees. Identical code scored 87.5% and 92.5% on the dev split in two runs. **Treat differences of 2–3 questions per split as noise**; the row check below is measured in a way that avoids it.
 
 #### How we got here: the ablation
@@ -151,13 +152,19 @@ What this shows:
 
 #### Wrong rows: what worked and what did not
 
-The remaining errors were answers that quote a real figure from the wrong row (38 Qatari girls instead of 40 boys) or the wrong table (building completion certificates instead of permits; the "fewer than 10 employees" table instead of all establishments). Two attempts:
+The remaining errors were answers that quote a real figure from the wrong row (38 Qatari girls instead of 40 boys) or the wrong table (building completion certificates instead of permits; the "fewer than 10 employees" table instead of all establishments). Three attempts, each measured on fresh or paired data:
 
 **1. Better row matching: did not help.** Inspecting the failures showed causes in how rows are picked: "boys" never matches the data's "Males", "household" never matches "Domestic", "Non-Qataris" contains "Qatari", and a wrong translation ("Qatari boys" rendered as "الإناث القطريات") pushed the right row out of the model's view. Synonym-aware matching, a negation penalty, a lower weight for the translation and two prompt rules fixed those cases, and lifted the test split from 82.5% to 87.5%. But the test split was where the fixes came from, so that gain proves little. On the dev and large splits every combination was worse or level (dev 85–87.5%, large 71–83%, against 92.5% and 87.5% before), and on the fresh test2 split, written before evaluating, accuracy was unchanged (87.5% before and after). With run-to-run variation of 2–3 questions per split, these heuristics were not shown to help, so they were **reverted**.
 
 **2. A row check after answering: helps.** The row behind the answer is shown to the model with the question and its table title, with one question: does this row match every condition? Because the check judges an answer that already exists, it can be measured without run-to-run noise: in one run over all 168 questions it held back 9 answers, and **8 of them would have been wrong** (including 38 girls for boys, a Q4 figure for a full year, the fewer-than-10-employees table, and a "0"). One correct answer was held back (a Gulf-dialect question using "ولد" for boys). It halves the wrong figures shown (16 → 8 in that run), costs about 0.1 s per question, and is on in the recommended setup (`VERIFY_ROW=1`).
 
-What it cannot catch: a row that matches everything the question says but is still the wrong one, for example a Qatari-only row for a question that names no nationality (the total was wanted). Those 8 answers remain.
+What it cannot catch: a row that matches everything the question says but is still the wrong one, for example a Qatari-only row for a question that names no nationality (the total was wanted).
+
+**3. A sub-group check in code: helps.** Asking the model more strictly did not work: a stricter row-check prompt, tested on the same answers, caught exactly the same 8 and still accepted the Qatari-only row, the 10+-employees table and a single-occupation row. So the pattern is detected in code, narrowly: the row is limited to a **nationality**, a **gender** or an **establishment size** (from the table title) that the question, or its translation, does not mention. Then the model answers once more, told what the row was limited to ("Nationality: Qatari; the question names no nationality, so use the total row"); if the new row is still limited, the figure is withheld. On the same 136 answers it fired 4 times: it **corrected** one wrong answer (86 Qatari girls → the total, 160), **withheld** one (the 10+-employees table), let one correct answer through after a correct retry, and withheld one muddled answer that listed the total and both sub-groups at once. Wrong figures shown fell from 8 to 6 with no clean correct answer lost.
+
+Writing the gold set for this exposed two of my own ambiguous questions (L10, L11): each figure exists for all establishments and for those with 10+ employees, and the question did not say which. Both now name the size.
+
+**What is left (6 of 148 lookups):** a wrong measure (a GDP value for a percentage question; a month asked, a whole-year total given), a near-identical table (a facility table instead of the national total), or one category or status within the right table (one occupation; lawsuits "not completed" instead of all). Occupation and status columns are left alone by the sub-group check on purpose: they are usually part of a correct answer.
 
 #### Large datasets
 
@@ -182,7 +189,8 @@ The 16 datasets above 5,000 rows used to be indexed by their description only. T
 - [x] App screenshot with the new controls
 - [x] Docker, test-run on an RTX 5060 Ti (WSL 2)
 - [x] Row check after answering: halves the wrong figures shown
-- [ ] The wrong answers that match the question but come from a sub-group or a near-identical table (8 of 148 lookups)
+- [x] Sub-group check (nationality, gender, establishment size): corrects or withholds rows limited to an unasked group
+- [ ] The last wrong answers: a wrong measure or period, a near-identical table, one category within the right table (6 of 148 lookups)
 
 ## Data and licence
 

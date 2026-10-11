@@ -213,8 +213,9 @@ LARGE = [
      "كم كانت إنتاجية المشتغل في صناعة المنسوجات عام 2017 لجميع المنشآت؟", False),
     ("L11", "estimates-of-value-of-intermediate-services-by-main-economic-activity-energy-and-industry-10",
      ["Year: 2017", "Main Economic Activity: Manufacture of food products /", "Machinery and Equipment Maintenance"], "15,484",
-     "What was the value of machinery and equipment maintenance services used in food manufacturing in 2017?",
-     "كم كانت قيمة خدمات صيانة الآلات والمعدات في صناعة المنتجات الغذائية عام 2017؟", False),
+     # The same figure exists for all establishments (16,300) and for 10+ employees (15,484): the question names which.
+     "What was the value of machinery and equipment maintenance services used in food manufacturing in 2017, in establishments with 10 or more employees?",
+     "كم كانت قيمة خدمات صيانة الآلات والمعدات في صناعة المنتجات الغذائية عام 2017 في المنشآت التي يعمل بها 10 موظفين أو أكثر؟", False),
     ("L12", "registered-deaths-by-nationality-gender-and-age-annual",
      ["Year: 2020", "of Age: 72", "Nationality: Qataris", "Gender: Males"], "8",
      "How many deaths of 72-year-old Qatari men were registered in 2020?",
